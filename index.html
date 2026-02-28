@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FLEISCHER — Rate & Quote Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/@kenjiuno/msgreader@1.6.5/lib/index.umd.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
 
@@ -801,9 +802,9 @@
               <div class="drop-zone mb-4" id="drop-zone">
                 <div class="drop-zone-icon">📧</div>
                 <div class="drop-zone-text">
-                  <strong>Drop .eml or .txt file here</strong><br>
+                  <strong>Drop email here</strong> — .msg, .eml, or .txt<br>
                   <span style="font-size:12px;color:var(--label3);margin-top:4px;display:block">
-                    For .msg files from Outlook: open the email, select all text (Ctrl+A), copy, and paste below
+                    Drag directly from Outlook or your file system
                   </span>
                 </div>
               </div>
@@ -3127,12 +3128,38 @@ async function runAIQuoteReview() {
 }
 
 // ═══════════════════════════════════════════════════════
-// .MSG FILE PARSER (msgreader via CDN)
+// .MSG FILE PARSER — using @kenjiuno/msgreader
 // ═══════════════════════════════════════════════════════
 
-// We extract text from .msg files by reading the binary and pulling readable strings
-function extractTextFromMsg(arrayBuffer) {
-  // Simple extraction: pull readable ASCII/UTF-8 strings from binary .msg
+async function extractTextFromMsg(arrayBuffer) {
+  try {
+    // Try using MsgReader library if available
+    if (typeof MsgReader !== 'undefined') {
+      const reader = new MsgReader(arrayBuffer);
+      const fileData = reader.getFileData();
+      const parts = [];
+      if (fileData.senderName) parts.push('From: ' + fileData.senderName);
+      if (fileData.senderEmail) parts.push('From Email: ' + fileData.senderEmail);
+      if (fileData.subject) parts.push('Subject: ' + fileData.subject);
+      if (fileData.body) parts.push('\n' + fileData.body);
+      if (fileData.bodyHTML) {
+        // Strip HTML tags for plain text
+        const tmp = document.createElement('div');
+        tmp.innerHTML = fileData.bodyHTML;
+        parts.push('\n' + tmp.textContent);
+      }
+      // Include attachments text if any
+      if (fileData.attachments && fileData.attachments.length) {
+        parts.push('\nAttachments: ' + fileData.attachments.map(a => a.fileName).join(', '));
+      }
+      const result = parts.join('\n');
+      if (result.trim().length > 20) return result;
+    }
+  } catch(e) {
+    console.warn('MsgReader failed, falling back to binary extraction:', e);
+  }
+
+  // Fallback: extract readable strings from binary
   const bytes = new Uint8Array(arrayBuffer);
   let text = '';
   let run = '';
@@ -3141,12 +3168,26 @@ function extractTextFromMsg(arrayBuffer) {
     if ((b >= 32 && b < 127) || b === 9 || b === 10 || b === 13) {
       run += String.fromCharCode(b);
     } else {
-      if (run.length > 4) text += run + ' ';
+      if (run.length > 6) text += run + ' ';
       run = '';
     }
   }
-  // Clean up and return meaningful lines
-  return text.split(/\s{3,}/).filter(s => s.trim().length > 10).join('\n').slice(0, 8000);
+  // Also try UTF-16 (common in .msg)
+  const view = new DataView(arrayBuffer);
+  let utf16 = '';
+  for (let i = 0; i < bytes.length - 1; i += 2) {
+    const code = view.getUint16(i, true);
+    if (code >= 32 && code < 127) utf16 += String.fromCharCode(code);
+    else if (code === 10 || code === 13) utf16 += '\n';
+    else if (utf16.length > 0) utf16 += ' ';
+  }
+  const combined = [text, utf16]
+    .join('\n')
+    .split(/\s{4,}/)
+    .filter(s => s.trim().length > 8)
+    .join('\n')
+    .slice(0, 8000);
+  return combined;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3940,21 +3981,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (dz) {
     dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
     dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-    dz.addEventListener('drop', e => {
+    dz.addEventListener('drop', async e => {
       e.preventDefault();
       dz.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
-      if (file) {
-        if (file.name.endsWith('.msg')) {
-          file.arrayBuffer().then(buf => {
-            document.getElementById('email-paste-area').value = extractTextFromMsg(buf);
-          });
+      if (!file) return;
+
+      const ext = file.name.toLowerCase().split('.').pop();
+      dz.innerHTML = '<div class="drop-zone-icon">⏳</div><div class="drop-zone-text">Reading <strong>' + file.name + '</strong>…</div>';
+
+      try {
+        if (ext === 'msg') {
+          const buf = await file.arrayBuffer();
+          const text = await extractTextFromMsg(buf);
+          document.getElementById('email-paste-area').value = text;
+          toast('📧 ' + file.name + ' loaded ✓', 'success');
         } else {
-          const reader = new FileReader();
-          reader.onload = ev => { document.getElementById('email-paste-area').value = ev.target.result; };
-          reader.readAsText(file);
+          const text = await file.text();
+          document.getElementById('email-paste-area').value = text;
+          toast('📄 ' + file.name + ' loaded ✓', 'success');
         }
+      } catch(err) {
+        toast('Could not read file: ' + err.message, 'error');
       }
+
+      // Reset drop zone
+      dz.innerHTML = '<div class="drop-zone-icon">📧</div><div class="drop-zone-text"><strong>Drop email here</strong> — .msg, .eml, or .txt<br><span style="font-size:12px;color:var(--label3);margin-top:4px;display:block">Drag directly from Outlook or your file system</span></div>';
     });
   }
 });
