@@ -1,0 +1,3963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLEISCHER — Rate & Quote Manager</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f2f2f7;
+    --surface: #ffffff;
+    --surface2: #f2f2f7;
+    --surface3: #e5e5ea;
+    --label: #000000;
+    --label2: #3c3c43cc;
+    --label3: #3c3c4399;
+    --label4: #3c3c4360;
+    --blue: #007aff;
+    --blue-light: #e8f1ff;
+    --green: #34c759;
+    --green-light: #e6f9eb;
+    --orange: #ff9500;
+    --orange-light: #fff4e0;
+    --red: #ff3b30;
+    --red-light: #fff0ef;
+    --indigo: #5856d6;
+    --indigo-light: #eeeeff;
+    --border: rgba(60,60,67,0.13);
+    --border-strong: rgba(60,60,67,0.22);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 16px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'DM Mono', 'SF Mono', 'Menlo', monospace;
+    --sidebar-width: 228px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--label);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ─── LAYOUT ─────────────────────────────────────── */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .wordmark {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--label);
+    letter-spacing: -0.4px;
+  }
+  .sidebar-logo .tagline {
+    font-size: 11px;
+    color: var(--label3);
+    margin-top: 1px;
+    letter-spacing: 0.1px;
+  }
+
+  .nav-section { padding: 8px 0; }
+  .nav-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--label3);
+    padding: 6px 16px 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 12px;
+    margin: 1px 8px;
+    cursor: pointer;
+    color: var(--label2);
+    font-size: 14px;
+    font-weight: 400;
+    transition: all 0.15s;
+    border-radius: var(--radius-sm);
+  }
+  .nav-item:hover { background: rgba(0,0,0,0.04); color: var(--label); }
+  .nav-item.active {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-weight: 500;
+  }
+  .nav-item .icon { font-size: 15px; width: 20px; text-align: center; }
+
+  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; background: var(--bg); }
+
+  .topbar {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topbar-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: var(--label);
+  }
+
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+  .content { padding: 24px; flex: 1; }
+
+  /* ─── BUTTONS ─────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: var(--font);
+    white-space: nowrap;
+    letter-spacing: -0.1px;
+  }
+
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: #0066dd; }
+  .btn-primary:active { background: #0055bb; transform: scale(0.98); }
+
+  .btn-secondary { background: var(--surface); color: var(--label); border: 1px solid var(--border-strong); }
+  .btn-secondary:hover { background: var(--surface2); }
+
+  .btn-ghost { background: transparent; color: var(--label2); }
+  .btn-ghost:hover { background: rgba(0,0,0,0.05); color: var(--label); }
+
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #2dab4e; }
+
+  .btn-destructive { background: var(--red-light); color: var(--red); }
+  .btn-destructive:hover { background: #ffd9d7; }
+
+  .btn-sm { padding: 5px 11px; font-size: 13px; }
+  .btn-lg { padding: 11px 22px; font-size: 15px; font-weight: 600; }
+
+  /* ─── CARDS ─────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: none;
+  }
+
+  .card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+
+  /* ─── TABS ─────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--surface3);
+    border-radius: 9px;
+    padding: 2px;
+  }
+
+  .tab {
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--label2);
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--label); }
+  .tab.active { background: white; color: var(--label); box-shadow: var(--shadow-sm); }
+
+  /* ─── BADGES ─────────────────────────────────────── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 500;
+    font-family: var(--font);
+  }
+
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-green { background: var(--green-light); color: #1a8a38; }
+  .badge-orange { background: var(--orange-light); color: #c97000; }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-indigo { background: var(--indigo-light); color: var(--indigo); }
+  .badge-gray { background: var(--surface3); color: var(--label2); }
+
+  /* ─── FORMS ─────────────────────────────────────── */
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--label2);
+  }
+
+  .form-input, .form-select, .form-textarea {
+    padding: 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: var(--font);
+    color: var(--label);
+    background: var(--surface);
+    transition: all 0.15s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+  }
+  .form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+  .form-row { display: grid; gap: 12px; }
+  .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  /* ─── TABLE ─────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--label3);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    letter-spacing: -0.1px;
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: middle;
+    color: var(--label);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  /* ─── MODAL ─────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(8px) scale(0.99);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+  .modal-lg { max-width: 780px; }
+  .modal-xl { max-width: 1000px; }
+
+  .modal-header {
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .modal-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .modal-subtitle { font-size: 13px; color: var(--label3); margin-top: 2px; }
+  .modal-body { padding: 22px; }
+  .modal-footer {
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    background: var(--surface2);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  }
+
+  .modal-close {
+    background: var(--surface3);
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--label2);
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  .modal-close:hover { background: var(--border-strong); color: var(--label); }
+
+  /* ─── PROMPT MODAL (FCL/LCL smart prompts) ────────── */
+  .prompt-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 8px;
+  }
+  .prompt-option:hover { border-color: var(--blue); background: var(--blue-light); }
+  .prompt-option.selected { border-color: var(--blue); background: var(--blue-light); }
+  .prompt-option-label { font-size: 15px; font-weight: 500; }
+  .prompt-option-sub { font-size: 12px; color: var(--label3); margin-top: 2px; }
+  .prompt-option-check { color: var(--blue); font-size: 18px; display: none; }
+  .prompt-option.selected .prompt-option-check { display: block; }
+
+  /* ─── STAT CARDS ─────────────────────────────────── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .stat-label { font-size: 12px; font-weight: 500; color: var(--label3); margin-bottom: 6px; letter-spacing: -0.1px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--label); line-height: 1; letter-spacing: -1px; }
+  .stat-sub { font-size: 12px; color: var(--label3); margin-top: 4px; }
+
+  /* ─── DRAG ZONE ─────────────────────────────────── */
+  .drop-zone {
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 36px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface2);
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--blue);
+    background: var(--blue-light);
+  }
+  .drop-zone-icon { font-size: 32px; margin-bottom: 10px; }
+  .drop-zone-text { font-size: 14px; color: var(--label2); line-height: 1.5; }
+  .drop-zone-text strong { color: var(--label); }
+
+  /* ─── DOC TYPE SELECTOR ──────────────────────────── */
+  .doc-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .doc-type-btn {
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--surface);
+    text-align: left;
+  }
+  .doc-type-btn:hover { border-color: var(--blue); background: var(--blue-light); }
+  .doc-type-btn.selected { border-color: var(--blue); background: var(--blue-light); }
+  .doc-type-btn .doc-icon { font-size: 22px; margin-bottom: 6px; }
+  .doc-type-btn .doc-label { font-size: 13.5px; font-weight: 600; color: var(--label); }
+  .doc-type-btn .doc-sub { font-size: 12px; color: var(--label3); margin-top: 2px; line-height: 1.4; }
+
+  /* ─── AI BADGE ─────────────────────────────────── */
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--indigo);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: -0.1px;
+  }
+
+  /* ─── WARNING BANNER ─────────────────────────────── */
+  .rate-warning { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--orange); font-weight: 500; }
+
+  /* ─── SEARCH BAR ─────────────────────────────────── */
+  .search-wrap { position: relative; }
+  .search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--label3); font-size: 13px; }
+  .search-input {
+    padding: 7px 12px 7px 32px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: var(--font);
+    color: var(--label);
+    background: var(--surface);
+    outline: none;
+    width: 220px;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+  }
+  .search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.15); width: 280px; }
+
+  /* ─── LINE ITEMS ─────────────────────────────────── */
+  .line-items-table th, .line-items-table td { padding: 8px 12px; }
+  .amount-input {
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: var(--font-mono);
+    text-align: right;
+    width: 100px;
+    outline: none;
+    background: var(--surface);
+    color: var(--label);
+  }
+  .amount-input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,122,255,0.15); }
+
+  .currency-select {
+    padding: 6px 6px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: var(--font);
+    outline: none;
+    background: var(--surface);
+    color: var(--label);
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+
+  /* ─── TOAST ─────────────────────────────────────── */
+  #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+
+  .toast {
+    background: rgba(30,30,30,0.92);
+    backdrop-filter: blur(12px);
+    color: white;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 320px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.1px;
+  }
+  .toast.success { background: rgba(52,199,89,0.95); }
+  .toast.error { background: rgba(255,59,48,0.95); }
+
+  @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* ─── LOADING ─────────────────────────────────────── */
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-overlay { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px; gap: 14px; color: var(--label3); }
+  .loading-overlay .spinner-dark {
+    width: 24px; height: 24px;
+    border: 2.5px solid var(--border-strong); border-top-color: var(--blue);
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+  }
+
+  /* ─── EMPTY STATE ─────────────────────────────────── */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--label3); }
+  .empty-state .empty-icon { font-size: 44px; margin-bottom: 14px; }
+  .empty-state h3 { font-size: 17px; font-weight: 600; color: var(--label); margin-bottom: 6px; letter-spacing: -0.3px; }
+  .empty-state p { font-size: 14px; max-width: 300px; margin: 0 auto 20px; color: var(--label3); }
+
+  /* ─── SECTION ─────────────────────────────────────── */
+  .section-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.3px; }
+  .section-sub { font-size: 14px; color: var(--label3); margin-bottom: 18px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* ─── UTILITY ─────────────────────────────────────── */
+  .flex { display: flex; }
+  .flex-col { display: flex; flex-direction: column; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-2 { gap: 8px; }
+  .gap-3 { gap: 12px; }
+  .gap-4 { gap: 16px; }
+  .gap-6 { gap: 24px; }
+  .mb-4 { margin-bottom: 16px; }
+  .mb-6 { margin-bottom: 24px; }
+  .mt-4 { margin-top: 16px; }
+  .text-muted { color: var(--label3); }
+  .text-sm { font-size: 12.5px; }
+  .mono { font-family: var(--font-mono); }
+  .font-medium { font-weight: 500; }
+  .font-semibold { font-weight: 600; }
+
+  /* ─── PAGE TRANSITIONS ─────────────────────────────── */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.15s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ─── FILTER ROW ─────────────────────────────────── */
+  .filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+
+  /* ─── ACTIVE FILTER ──────────────────────────────── */
+  .active-filter { background: var(--blue) !important; color: white !important; border-color: var(--blue) !important; }
+
+  /* ─── PARSED FIELD ───────────────────────────────── */
+  .parsed-field { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 8px; background: var(--surface2); margin-bottom: 6px; }
+  .parsed-field-label { font-size: 12px; font-weight: 500; color: var(--label3); min-width: 100px; padding-top: 1px; }
+  .parsed-field-value { font-size: 14px; color: var(--label); font-weight: 400; flex: 1; }
+  .parsed-field-value[contenteditable="true"]:focus { outline: 2px solid var(--blue); border-radius: 4px; padding: 1px 4px; }
+
+  /* ─── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ─── INCOTERM DELIVERY PROMPT ───────────────────── */
+  .delivery-prompt {
+    background: var(--orange-light);
+    border: 1px solid rgba(255,149,0,0.25);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .delivery-prompt-text { font-size: 13.5px; font-weight: 500; color: #7a4800; }
+  .delivery-prompt-sub { font-size: 12px; color: #a06010; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ─── SIDEBAR ─────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="wordmark">FLEISCHER</div>
+      <div class="tagline">Rate & Quote Manager</div>
+    </div>
+
+    <nav>
+      <div class="nav-section">
+        <div class="nav-label">Overview</div>
+        <div class="nav-item active" onclick="showPage('dashboard')">
+          <span class="icon">📊</span> Dashboard
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Rates</div>
+        <div class="nav-item" onclick="showPage('rates')">
+          <span class="icon">📋</span> Rate Library
+        </div>
+        <div class="nav-item" onclick="showPage('parse')">
+          <span class="icon">✉️</span> Parse Email
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Quoting</div>
+        <div class="nav-item" onclick="showPage('builder')">
+          <span class="icon">🏗️</span> Quote Builder
+        </div>
+        <div class="nav-item" onclick="showPage('history')">
+          <span class="icon">🗂️</span> Quote History
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Data</div>
+        <div class="nav-item" onclick="showPage('contacts')">
+          <span class="icon">🏢</span> Carriers & Clients
+        </div>
+        <div class="nav-item" onclick="showPage('training')">
+          <span class="icon">🧠</span> AI Training
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">System</div>
+        <div class="nav-item" onclick="showPage('settings')">
+          <span class="icon">⚙️</span> Settings
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ─── MAIN ─────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="topbar">
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-actions">
+          <button class="btn btn-secondary btn-sm" onclick="showPage('parse')">✉️ Parse Email</button>
+          <button class="btn btn-primary btn-sm" onclick="showPage('builder')">+ New Quote</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stats-grid" id="dashboard-stats"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Recent Quotes</span>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('history')">View all →</button>
+            </div>
+            <div class="table-wrap">
+              <table id="dashboard-quotes-table">
+                <thead><tr>
+                  <th>Quote #</th><th>Client</th><th>Lane</th><th>Total</th><th>Date</th>
+                </tr></thead>
+                <tbody id="dashboard-quotes-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Rate Alerts</span>
+            </div>
+            <div id="rate-alerts-body" style="padding:16px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RATE LIBRARY -->
+    <div id="page-rates" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Rate Library</div>
+        <div class="topbar-actions">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" placeholder="Search rates..." id="rate-search" oninput="filterRates()">
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openModal('add-rate-modal')">+ Add Rate</button>
+          <button class="btn btn-primary btn-sm" onclick="showPage('parse')">✉️ Parse Email</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="filter-row" id="rate-filters">
+          <span class="text-muted text-sm">Filter:</span>
+          <button class="btn btn-secondary btn-sm active-filter" onclick="setRateFilter('all',this)">All</button>
+          <button class="btn btn-secondary btn-sm" onclick="setRateFilter('ocean',this)">🌊 Ocean</button>
+          <button class="btn btn-secondary btn-sm" onclick="setRateFilter('air',this)">✈️ Air</button>
+          <button class="btn btn-secondary btn-sm" onclick="setRateFilter('trucking',this)">🚛 Trucking</button>
+          <button class="btn btn-secondary btn-sm" onclick="setRateFilter('brokerage',this)">📑 Brokerage</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Mode</th><th>Carrier</th><th>Origin</th><th>Destination</th>
+                <th>Rate</th><th>Currency</th><th>Unit</th><th>Valid Until</th><th>Status</th><th></th>
+              </tr></thead>
+              <tbody id="rates-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARSE EMAIL -->
+    <div id="page-parse" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Parse & Import</div>
+        <div class="topbar-actions">
+          <span class="ai-badge">✦ AI-Powered</span>
+        </div>
+      </div>
+      <div class="content">
+
+        <!-- Step 1: Document type -->
+        <div id="parse-step1">
+          <div class="section-title">What are you importing?</div>
+          <div class="section-sub">Select the document type so FLEISCHER knows how to process it.</div>
+          <div class="doc-type-grid">
+            <div class="doc-type-btn" onclick="selectDocType('rfq', this)">
+              <div class="doc-icon">📥</div>
+              <div class="doc-label">Client Quote Request</div>
+              <div class="doc-sub">Inbound RFQ from a client — FLEISCHER will help you build a return quote</div>
+            </div>
+            <div class="doc-type-btn" onclick="selectDocType('carrier_rate', this)">
+              <div class="doc-icon">🌊</div>
+              <div class="doc-label">Carrier Rate Confirmation</div>
+              <div class="doc-sub">Ocean, air, or multimodal rate from a carrier — saved to Rate Library</div>
+            </div>
+            <div class="doc-type-btn" onclick="selectDocType('trucker_quote', this)">
+              <div class="doc-icon">🚛</div>
+              <div class="doc-label">Trucker / Drayage Quote</div>
+              <div class="doc-sub">Cost quote from a trucker — saved as your cost in Rate Library</div>
+            </div>
+            <div class="doc-type-btn" onclick="selectDocType('origin_agent', this)">
+              <div class="doc-icon">📦</div>
+              <div class="doc-label">Origin Agent Quote</div>
+              <div class="doc-sub">Cost quote from origin agent — your cost, add margin before quoting client</div>
+            </div>
+            <div class="doc-type-btn" onclick="selectDocType('dest_agent', this)">
+              <div class="doc-icon">🏁</div>
+              <div class="doc-label">Destination Agent Quote</div>
+              <div class="doc-sub">Agent needs a quote from you — they become the client, you quote with margins</div>
+            </div>
+            <div class="doc-type-btn" onclick="selectDocType('general', this)">
+              <div class="doc-icon">📄</div>
+              <div class="doc-label">General / Other</div>
+              <div class="doc-sub">Any other document — AI will identify and extract what it can</div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" id="parse-next-btn" onclick="goToParseStep2()" style="display:none">
+            Continue →
+          </button>
+        </div>
+
+        <!-- Step 2: Input + Results -->
+        <div id="parse-step2" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+            <button class="btn btn-secondary btn-sm" onclick="backToParseStep1()">← Back</button>
+            <span id="parse-doc-type-label" class="badge badge-blue"></span>
+            <span class="text-muted text-sm">Paste the document text or drop a file below</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+            <div>
+              <div class="drop-zone mb-4" id="drop-zone">
+                <div class="drop-zone-icon">📧</div>
+                <div class="drop-zone-text">
+                  <strong>Drop .eml or .txt file here</strong><br>
+                  <span style="font-size:12px;color:var(--label3);margin-top:4px;display:block">
+                    For .msg files from Outlook: open the email, select all text (Ctrl+A), copy, and paste below
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-group mb-4">
+                <label class="form-label">Paste document text</label>
+                <textarea class="form-textarea" id="email-paste-area" rows="14"
+                  placeholder="Paste your email or document content here…"></textarea>
+              </div>
+
+              <button class="btn btn-primary btn-lg" onclick="parseEmail()" id="parse-btn" style="width:100%">
+                ✦ Parse with AI
+              </button>
+            </div>
+
+            <div>
+              <div id="parse-loading" style="display:none">
+                <div class="loading-overlay">
+                  <div class="spinner-dark"></div>
+                  <div class="text-muted">Analyzing with Claude AI…</div>
+                </div>
+              </div>
+
+              <div id="parse-results" style="display:none">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                  <div class="section-title" style="margin-bottom:0">Extracted Data</div>
+                  <span class="ai-badge">✦ Claude</span>
+                </div>
+
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <span class="card-title" id="parsed-type-label">Details</span>
+                    <span id="parsed-mode-badge"></span>
+                  </div>
+                  <div style="padding:14px" id="parsed-fields"></div>
+                </div>
+
+                <div class="card mb-4" id="parsed-line-items-card" style="display:none">
+                  <div class="card-header">
+                    <span class="card-title">Line Items</span>
+                    <button class="btn btn-ghost btn-sm" onclick="addParsedLine()">+ Add</button>
+                  </div>
+                  <div class="table-wrap">
+                    <table class="line-items-table">
+                      <thead><tr>
+                        <th>Description</th><th>Amount</th><th>Currency</th><th>Unit</th><th></th>
+                      </tr></thead>
+                      <tbody id="parsed-lines-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div id="parse-dest-agent-notice" style="display:none;padding:14px 16px;background:var(--indigo-light);border-radius:var(--radius);margin-bottom:14px;font-size:13.5px;color:var(--indigo)">
+                  <strong>Destination Agent Flow:</strong> This agent is your client. After saving, FLEISCHER will open Quote Builder pre-filled with their request so you can add your margins and return a quote.
+                </div>
+
+                <div style="display:flex;gap:8px;justify-content:space-between">
+                  <button class="btn btn-secondary" onclick="clearParse()">Clear</button>
+                  <button class="btn btn-primary btn-lg" onclick="saveToRateLibrary()" id="parse-save-btn">
+                    💾 Save to Library
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- QUOTE BUILDER -->
+    <div id="page-builder" class="page">
+      <div class="topbar">
+        <div class="topbar-title" id="builder-title">New Quote</div>
+        <div class="topbar-actions">
+          <span id="quote-number-display" class="mono text-muted text-sm"></span>
+          <button class="btn btn-ghost btn-sm" onclick="runAIQuoteReview()">✦ AI Review</button>
+          <button class="btn btn-secondary btn-sm" onclick="previewQuote()">👁 Preview</button>
+          <button class="btn btn-primary btn-sm" onclick="saveQuote()">💾 Save Quote</button>
+        </div>
+      </div>
+      <div class="content">
+        <div style="display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start">
+
+          <!-- Left panel: quote metadata -->
+          <div class="flex-col gap-4">
+            <div class="card">
+              <div class="card-header"><span class="card-title">Quote Details</span></div>
+              <div style="padding:16px" class="flex-col gap-3">
+                <div class="form-group">
+                  <label class="form-label">Client Name</label>
+                  <input class="form-input" id="q-client" placeholder="Acme Corp" oninput="updateQuoteTitle()">
+                </div>
+                <div class="form-row cols-2">
+                  <div class="form-group">
+                    <label class="form-label">Origin</label>
+                    <input class="form-input" id="q-origin" placeholder="Los Angeles, CA">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Destination</label>
+                    <input class="form-input" id="q-dest" placeholder="Shanghai, CN">
+                  </div>
+                </div>
+                <div class="form-row cols-2">
+                  <div class="form-group">
+                    <label class="form-label">Mode</label>
+                    <select class="form-select" id="q-mode">
+                      <option value="ocean">🌊 Ocean</option>
+                      <option value="air">✈️ Air</option>
+                      <option value="trucking">🚛 Trucking</option>
+                      <option value="multimodal">🔀 Multimodal</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Incoterm</label>
+                    <select class="form-select" id="q-incoterm">
+                      <option>FOB</option><option>CIF</option><option>EXW</option>
+                      <option>DDP</option><option>DAP</option><option>CPT</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row cols-2">
+                  <div class="form-group">
+                    <label class="form-label">Valid From</label>
+                    <input class="form-input" type="date" id="q-valid-from">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Valid Until</label>
+                    <input class="form-input" type="date" id="q-valid-to">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Notes / Remarks</label>
+                  <textarea class="form-textarea" id="q-notes" rows="3" placeholder="Subject to space availability…"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Quote Owner</label>
+                  <select class="form-select" id="q-owner">
+                    <option>Alex Chen</option>
+                    <option>Maria Rodriguez</option>
+                    <option>James Park</option>
+                    <option>Sarah Liu</option>
+                    <option>Tom Walsh</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Suggest from Library</span>
+              </div>
+              <div style="padding:12px">
+                <button class="btn btn-green btn-sm" style="width:100%" onclick="suggestRates()">
+                  🔎 Find Matching Rates
+                </button>
+                <div id="suggested-rates" style="margin-top:12px"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right panel: line items -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Line Items</span>
+              <div class="flex gap-2">
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem('freight','Ocean Freight')">+ Freight</button>
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem('surcharge','')">+ Surcharge</button>
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem('customs','Customs Brokerage')">+ Customs</button>
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem('other','')">+ Other</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="line-items-table">
+                <thead><tr>
+                  <th>Category</th><th>Description</th><th>Qty</th><th>Rate</th><th>Currency</th><th>Margin</th><th>Total (USD)</th><th></th>
+                </tr></thead>
+                <tbody id="line-items-body"></tbody>
+              </table>
+            </div>
+            <div style="padding:16px;border-top:1px solid var(--border)">
+              <div style="display:flex;justify-content:flex-end;gap:32px;align-items:center">
+                <div style="text-align:right">
+                  <div class="text-muted text-sm mb-4">Cost (no margin): <span class="mono font-semibold" id="q-subtotal">$0.00</span></div>
+                  <div class="text-muted text-sm mb-4">Total Margin: <span class="mono font-semibold" id="q-margin-amt">$0.00</span></div>
+                  <div style="font-size:18px;font-family:'Fraunces',serif;font-weight:600">
+                    Client Total: <span id="q-total">$0.00</span>
+                  </div>
+                  <div class="text-muted text-sm" style="margin-top:4px">Margin per line item — set above ↑</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUOTE HISTORY -->
+    <div id="page-history" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Quote History</div>
+        <div class="topbar-actions">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" placeholder="Search quotes..." id="history-search" oninput="filterHistory()">
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showPage('builder')">+ New Quote</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="filter-row">
+          <span class="text-muted text-sm">Mode:</span>
+          <button class="btn btn-secondary btn-sm active-filter" onclick="setHistoryFilter('all',this)">All</button>
+          <button class="btn btn-secondary btn-sm" onclick="setHistoryFilter('ocean',this)">Ocean</button>
+          <button class="btn btn-secondary btn-sm" onclick="setHistoryFilter('air',this)">Air</button>
+          <button class="btn btn-secondary btn-sm" onclick="setHistoryFilter('trucking',this)">Trucking</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Quote #</th><th>Client</th><th>Lane</th><th>Mode</th>
+                <th>Total (USD)</th><th>Owner</th><th>Date</th><th>Status</th><th></th>
+              </tr></thead>
+              <tbody id="history-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACTS -->
+    <div id="page-contacts" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Carriers & Clients</div>
+        <div class="topbar-actions">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" placeholder="Search..." id="contacts-search" oninput="filterContacts()">
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddContact()">+ Add Contact</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="tabs mb-6" style="width:fit-content">
+          <div class="tab active" onclick="setContactTab('carriers',this)">Carriers & Truckers</div>
+          <div class="tab" onclick="setContactTab('clients',this)">Clients</div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Name</th><th>Type</th><th>Contact</th><th>Email</th><th>Phone</th><th>Notes</th><th></th>
+              </tr></thead>
+              <tbody id="contacts-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="page-settings" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Settings</div>
+      </div>
+      <div class="content">
+        <div style="max-width:700px">
+          <div class="section-title">Default Margins</div>
+          <div class="section-sub">These defaults apply when building a new quote. You can override per line item at any time.</div>
+
+          <div class="card mb-6">
+            <div class="card-header"><span class="card-title">Margin Defaults by Category</span></div>
+            <div style="padding:20px" class="flex-col gap-3">
+              <div class="form-row cols-3">
+                <div class="form-group">
+                  <label class="form-label">Ocean Freight %</label>
+                  <input class="form-input" type="number" id="cfg-margin-ocean" min="0" max="100" step="0.5">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Air Freight %</label>
+                  <input class="form-input" type="number" id="cfg-margin-air" min="0" max="100" step="0.5">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Trucking / Drayage %</label>
+                  <input class="form-input" type="number" id="cfg-margin-trucking" min="0" max="100" step="0.5">
+                </div>
+              </div>
+              <div class="form-row cols-2">
+                <div class="form-group">
+                  <label class="form-label">LCL Destination Fees %</label>
+                  <input class="form-input" type="number" id="cfg-margin-lcl-dest" min="0" max="100" step="0.5">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Problem Client Premium %</label>
+                  <input class="form-input" type="number" id="cfg-margin-problem" min="0" max="100" step="0.5">
+                  <span class="text-muted text-sm" style="margin-top:4px">Added on top of base margin for flagged clients</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">Zero-Margin Pass-Through Charges</div>
+          <div class="section-sub">These charges are always billed at cost. No margin is applied automatically.</div>
+          <div class="card mb-6">
+            <div style="padding:16px;display:flex;flex-wrap:wrap;gap:8px" id="passthrough-tags">
+              <!-- rendered by JS -->
+            </div>
+            <div style="padding:0 16px 16px;display:flex;gap:8px">
+              <input class="form-input" id="new-passthrough" placeholder="Add charge type…" style="flex:1">
+              <button class="btn btn-secondary" onclick="addPassthrough()">Add</button>
+            </div>
+          </div>
+
+          <div class="section-title">Team Members</div>
+          <div class="section-sub">Names that appear in the Quote Owner dropdown.</div>
+          <div class="card mb-6">
+            <div style="padding:16px;display:flex;flex-wrap:wrap;gap:8px" id="team-tags"></div>
+            <div style="padding:0 16px 16px;display:flex;gap:8px">
+              <input class="form-input" id="new-team-member" placeholder="Add team member…" style="flex:1">
+              <button class="btn btn-secondary" onclick="addTeamMember()">Add</button>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" onclick="saveSettings()">💾 Save Settings</button>
+
+          <div style="margin-top:40px;padding:24px;background:var(--label);border-radius:12px;color:var(--bg)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+              <span style="font-size:20px">🔌</span>
+              <span style="font-family:'Fraunces',serif;font-size:18px;font-weight:600">Database Connection</span>
+              <span id="supabase-status-label" style="font-size:12px;font-family:'DM Mono',monospace;opacity:0.6;margin-left:4px"></span>
+            </div>
+            <div style="font-size:13px;opacity:0.6;margin-bottom:20px">Connect to Supabase for permanent cloud storage — data survives browser clears and syncs across your team.</div>
+
+            <div id="supabase-connected-banner" style="display:none;padding:12px 16px;background:rgba(61,90,71,0.4);border-radius:8px;color:#a8d4b0;font-weight:500;margin-bottom:16px;font-size:13.5px">
+              ✅ Connected to Supabase — all data is syncing to the cloud
+            </div>
+
+            <div class="flex-col gap-3">
+              <div class="form-group">
+                <label class="form-label" style="color:rgba(255,255,255,0.5)">Supabase Project URL</label>
+                <input class="form-input" id="cfg-sb-url" placeholder="https://abcxyzabc.supabase.co" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:var(--bg)">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="color:rgba(255,255,255,0.5)">Supabase Anon Key</label>
+                <input class="form-input" id="cfg-sb-key" placeholder="sb_publishable_... or eyJhbGci..." style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:var(--bg)">
+                <span style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px">Your anon or publishable key — found in Project Settings → API</span>
+              </div>
+              <button class="btn btn-green" onclick="saveSupabaseConfig()" style="width:fit-content">🔌 Connect & Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI TRAINING -->
+    <div id="page-training" class="page">
+      <div class="topbar">
+        <div class="topbar-title">AI Training</div>
+        <div class="topbar-actions">
+          <span class="ai-badge">✦ Builds Intelligence</span>
+        </div>
+      </div>
+      <div class="content">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+
+          <!-- Bulk .msg upload -->
+          <div>
+            <div class="section-title">Bulk Rate Email Import</div>
+            <div class="section-sub">Upload multiple .msg or .eml files at once. FLEISCHER will parse each one and add rates to the library.</div>
+
+            <div class="drop-zone mb-4" id="bulk-drop-zone" onclick="document.getElementById('bulk-file-input').click()">
+              <div class="drop-zone-icon">📨</div>
+              <div class="drop-zone-text"><strong>Drop .msg / .eml files here</strong> or click to browse<br>
+                <span style="font-size:12px;color:var(--label3);margin-top:6px;display:block">Multiple files supported</span>
+              </div>
+            </div>
+            <input type="file" id="bulk-file-input" multiple accept=".msg,.eml,.txt" style="display:none" onchange="handleBulkFiles(this.files)">
+
+            <div id="bulk-queue" style="display:none">
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-medium" id="bulk-queue-label">0 files queued</span>
+                <button class="btn btn-primary" onclick="processBulkQueue()" id="bulk-process-btn">✦ Parse All with AI</button>
+              </div>
+              <div id="bulk-file-list" class="flex-col gap-2"></div>
+            </div>
+
+            <div id="bulk-results" style="display:none;margin-top:16px">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Import Results</span>
+                  <button class="btn btn-primary btn-sm" onclick="saveBulkResults()">💾 Save All to Library</button>
+                </div>
+                <div style="padding:16px" id="bulk-results-body"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Training data: past quotes & intel -->
+          <div class="flex-col gap-4">
+            <div>
+              <div class="section-title">Past Quote Training</div>
+              <div class="section-sub">Paste a past quote you've sent to a client. FLEISCHER learns your margin patterns, charge structures, and what was included.</div>
+              <div class="card mb-4">
+                <div style="padding:16px" class="flex-col gap-3">
+                  <div class="form-row cols-2">
+                    <div class="form-group">
+                      <label class="form-label">Client</label>
+                      <input class="form-input" id="train-client" placeholder="Client name">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Lane</label>
+                      <input class="form-input" id="train-lane" placeholder="e.g. Shanghai → LAX">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Paste Quote or Notes</label>
+                    <textarea class="form-textarea" id="train-quote-text" rows="6" placeholder="Paste the quote, email, or any notes about what was charged, what was missed, margin applied, issues that came up…"></textarea>
+                  </div>
+                  <button class="btn btn-green" onclick="trainOnQuote()">✦ Learn from This Quote</button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="section-title">Lane & Port Intelligence</div>
+              <div class="section-sub">Add notes about specific lanes, ports, or counterparties — things to watch out for, charges that get missed, risky partners.</div>
+              <div class="card">
+                <div style="padding:16px" class="flex-col gap-3">
+                  <div class="form-row cols-2">
+                    <div class="form-group">
+                      <label class="form-label">Subject Type</label>
+                      <select class="form-select" id="intel-type">
+                        <option value="lane">Lane</option>
+                        <option value="port">Port</option>
+                        <option value="carrier">Carrier</option>
+                        <option value="trucker">Trucker</option>
+                        <option value="client">Client</option>
+                        <option value="country">Country</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Name / Identifier</label>
+                      <input class="form-input" id="intel-subject" placeholder="e.g. Shanghai, Pacific Drayage, Acme Corp">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Flag Type</label>
+                    <select class="form-select" id="intel-flag">
+                      <option value="warning">⚠ Warning — watch out for this</option>
+                      <option value="always_include">✅ Always include this charge</option>
+                      <option value="often_missed">🔴 Often missed / forgotten</option>
+                      <option value="higher_margin">💰 Higher margin recommended</option>
+                      <option value="zip_coverage">📍 Trucker zip code coverage</option>
+                      <option value="note">📝 General note</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Details</label>
+                    <textarea class="form-textarea" id="intel-details" rows="3" placeholder="e.g. 'Always add chassis split fee at Long Beach' or 'This trucker covers 90210–91999' or 'Client is slow pay, add 5% buffer'"></textarea>
+                  </div>
+                  <button class="btn btn-secondary" onclick="saveIntel()">+ Save Intelligence Note</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Existing intel notes -->
+            <div>
+              <div class="section-title" style="margin-bottom:8px">Saved Intelligence Notes</div>
+              <div id="intel-notes-list" class="flex-col gap-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  
+
+<!-- ─── MODALS ─────────────────────────────────────── -->
+
+<!-- Add Rate Modal -->
+<div class="modal-overlay" id="add-rate-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Add Rate</div>
+        <div class="modal-subtitle">Manually add a carrier rate to the library</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('add-rate-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-2 mb-4">
+        <div class="form-group">
+          <label class="form-label">Mode</label>
+          <select class="form-select" id="ar-mode">
+            <option value="ocean">🌊 Ocean</option>
+            <option value="air">✈️ Air</option>
+            <option value="trucking">🚛 Trucking/Drayage</option>
+            <option value="brokerage">📑 Brokerage</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Carrier / Provider</label>
+          <input class="form-input" id="ar-carrier" placeholder="Maersk, XYZ Trucking…">
+        </div>
+      </div>
+      <div class="form-row cols-2 mb-4">
+        <div class="form-group">
+          <label class="form-label">Origin</label>
+          <input class="form-input" id="ar-origin" placeholder="Los Angeles, CA">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Destination</label>
+          <input class="form-input" id="ar-dest" placeholder="Shanghai, CN">
+        </div>
+      </div>
+      <div class="form-row cols-4 mb-4">
+        <div class="form-group">
+          <label class="form-label">Rate</label>
+          <input class="form-input" id="ar-rate" type="number" placeholder="2450">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Currency</label>
+          <select class="form-select" id="ar-currency">
+            <option>USD</option><option>EUR</option><option>CNY</option><option>GBP</option>
+            <option>HKD</option><option>JPY</option><option>SGD</option><option>AUD</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unit</label>
+          <select class="form-select" id="ar-unit">
+            <option>20ft</option><option>40ft</option><option>40HC</option>
+            <option>per CBM</option><option>per KG</option><option>per shipment</option>
+            <option>per mile</option><option>per lane</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valid Until</label>
+          <input class="form-input" id="ar-valid" type="date">
+        </div>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Notes / Surcharges</label>
+        <textarea class="form-textarea" id="ar-notes" rows="3" placeholder="BAF included, PSS not included…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('add-rate-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveManualRate()">Save Rate</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quote Preview Modal -->
+<div class="modal-overlay" id="preview-modal">
+  <div class="modal modal-xl">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Quote Preview</div>
+        <div class="modal-subtitle">Review before saving or sending</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('preview-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="preview-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('preview-modal')">Close</button>
+      <button class="btn btn-primary" onclick="saveQuote();closeModal('preview-modal')">Save Quote</button>
+    </div>
+  </div>
+</div>
+
+<!-- View Quote Modal -->
+<div class="modal-overlay" id="view-quote-modal">
+  <div class="modal modal-xl">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="view-quote-title">Quote</div>
+        <div class="modal-subtitle" id="view-quote-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('view-quote-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="view-quote-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('view-quote-modal')">Close</button>
+      <button class="btn btn-primary" onclick="cloneQuote()">📋 Clone Quote</button>
+    </div>
+  </div>
+</div>
+
+<!-- FCL Markup Prompt Modal -->
+<div class="modal-overlay" id="fcl-markup-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">FCL Ocean Freight Markup</div>
+        <div class="modal-subtitle">How much would you like to add to the carrier rate?</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div id="fcl-options">
+        <div class="prompt-option" onclick="selectFCLMarkup(300, this)">
+          <div><div class="prompt-option-label">$300</div><div class="prompt-option-sub">Standard markup</div></div>
+          <span class="prompt-option-check">✓</span>
+        </div>
+        <div class="prompt-option" onclick="selectFCLMarkup(350, this)">
+          <div><div class="prompt-option-label">$350</div><div class="prompt-option-sub">Mid-range markup</div></div>
+          <span class="prompt-option-check">✓</span>
+        </div>
+        <div class="prompt-option" onclick="selectFCLMarkup(400, this)">
+          <div><div class="prompt-option-label">$400</div><div class="prompt-option-sub">Premium markup</div></div>
+          <span class="prompt-option-check">✓</span>
+        </div>
+        <div class="prompt-option" id="fcl-other-option" onclick="selectFCLMarkup('other', this)">
+          <div>
+            <div class="prompt-option-label">Other</div>
+            <div class="prompt-option-sub">Enter a custom amount</div>
+          </div>
+          <span class="prompt-option-check">✓</span>
+        </div>
+        <div id="fcl-custom-input" style="display:none;margin-top:10px">
+          <div class="form-group">
+            <label class="form-label">Custom markup amount ($)</label>
+            <input class="form-input" type="number" id="fcl-custom-value" placeholder="e.g. 425" min="0">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeFCLModal()">Skip</button>
+      <button class="btn btn-primary" onclick="applyFCLMarkup()">Apply Markup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delivery / Drayage Prompt Modal -->
+<div class="modal-overlay" id="delivery-prompt-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Include Delivery?</div>
+        <div class="modal-subtitle" id="delivery-prompt-sub">Do you want to quote delivery/drayage for this shipment?</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="prompt-option" onclick="selectDelivery(true, this)" id="delivery-yes">
+        <div>
+          <div class="prompt-option-label">Yes — include delivery</div>
+          <div class="prompt-option-sub">Add a trucking/drayage line item to this quote</div>
+        </div>
+        <span class="prompt-option-check">✓</span>
+      </div>
+      <div class="prompt-option" onclick="selectDelivery(false, this)" id="delivery-no">
+        <div>
+          <div class="prompt-option-label">No — freight only</div>
+          <div class="prompt-option-sub">Client arranges their own delivery</div>
+        </div>
+        <span class="prompt-option-check">✓</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('delivery-prompt-modal')">Skip</button>
+      <button class="btn btn-primary" onclick="applyDeliveryChoice()">Continue</button>
+    </div>
+  </div>
+</div>
+
+
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Add Contact</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('add-contact-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-2 mb-4">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input class="form-input" id="ac-name" placeholder="Company name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="ac-type">
+            <option value="ocean_carrier">Ocean Carrier</option>
+            <option value="air_carrier">Air Carrier</option>
+            <option value="trucker">Trucker / Drayage</option>
+            <option value="broker">Customs Broker</option>
+            <option value="client">Client</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-2 mb-4">
+        <div class="form-group">
+          <label class="form-label">Contact Person</label>
+          <input class="form-input" id="ac-contact" placeholder="John Smith">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="ac-email" type="email" placeholder="john@carrier.com">
+        </div>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="ac-phone" placeholder="+1 555 000 0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="ac-notes" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('add-contact-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA STORE (persistent via localStorage)
+// ═══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE CONFIGURATION
+// Set your credentials in Settings → Database Connection.
+// They are saved in your browser and loaded automatically.
+// ═══════════════════════════════════════════════════════
+const SUPABASE_URL = localStorage.getItem('fleischer_sb_url') || '';
+const SUPABASE_KEY = localStorage.getItem('fleischer_sb_key') || '';
+
+const USE_SUPABASE = !!(SUPABASE_URL && SUPABASE_KEY);
+
+// Supabase REST helpers
+function sbHeaders() {
+  return {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'X-Client-Info': 'fleischer/1.0'
+  };
+}
+
+async function sbSelect(table, filters = '') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filters}&order=id.desc`, {
+    headers: sbHeaders()
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`${res.status}: ${txt}`);
+  }
+  return res.json();
+}
+
+async function sbInsert(table, row) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { ...sbHeaders(), Prefer: 'return=representation' },
+    body: JSON.stringify(row)
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`${res.status}: ${txt}`);
+  }
+  return res.json();
+}
+
+async function sbUpdate(table, id, row) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: { ...sbHeaders(), Prefer: 'return=representation' },
+    body: JSON.stringify(row)
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`${res.status}: ${txt}`);
+  }
+  return res.json();
+}
+
+async function sbDelete(table, id) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'DELETE',
+    headers: sbHeaders()
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`${res.status}: ${txt}`);
+  }
+}
+
+async function sbUpsert(table, row) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { ...sbHeaders(), Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify(row)
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`${res.status}: ${txt}`);
+  }
+  return res.json();
+}
+
+// ── localStorage fallback ──────────────────────────────
+const DB_KEY = 'fleischer_v2';
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return initDB();
+}
+
+function saveDB() {
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+}
+
+// ── Supabase load — called on app init if configured ───
+async function loadFromSupabase() {
+  try {
+    showLoadingOverlay('Connecting to database…');
+    
+    // Test connection first with detailed logging
+    const testRes = await fetch(`${SUPABASE_URL}/rest/v1/rates?limit=1`, {
+      headers: { 
+        apikey: SUPABASE_KEY, 
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
+    
+    console.log('Supabase test status:', testRes.status);
+    const testText = await testRes.text();
+    console.log('Supabase test response:', testText);
+    
+    if (!testRes.ok && testRes.status !== 406) {
+      throw new Error(`HTTP ${testRes.status}: ${testText}`);
+    }
+
+    const [rates, quotes, contacts, intel, settingsRows] = await Promise.all([
+      sbSelect('rates'),
+      sbSelect('quotes'),
+      sbSelect('contacts'),
+      sbSelect('intel'),
+      sbSelect('settings'),
+    ]);
+
+    db.rates = rates.map(r => ({ ...r, id: String(r.id) }));
+    db.quotes = quotes.map(q => ({
+      ...q,
+      id: String(q.id),
+      lineItems: typeof q.line_items === 'string' ? JSON.parse(q.line_items) : (q.line_items || [])
+    }));
+    db.contacts = contacts.map(c => ({ ...c, id: String(c.id) }));
+    db.intel = intel.map(i => ({ ...i, id: String(i.id) }));
+    if (settingsRows.length) {
+      const s = settingsRows[0];
+      db.settings = typeof s.data === 'string' ? JSON.parse(s.data) : s.data;
+    }
+    hideLoadingOverlay();
+    toast('Connected to Fleischer database ✓', 'success');
+  } catch(e) {
+    hideLoadingOverlay();
+    console.error('Supabase load error:', e);
+    toast(`DB error: ${e.message}`, 'error');
+  }
+}
+
+function showLoadingOverlay(msg) {
+  let el = document.getElementById('global-loading');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'global-loading';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(245,242,236,0.92);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px';
+    el.innerHTML = `<div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite"></div><div style="font-family:'Fraunces',serif;font-size:20px;font-weight:600" id="global-loading-msg"></div>`;
+    document.body.appendChild(el);
+  }
+  document.getElementById('global-loading-msg').textContent = msg;
+  el.style.display = 'flex';
+}
+
+function hideLoadingOverlay() {
+  const el = document.getElementById('global-loading');
+  if (el) el.style.display = 'none';
+}
+
+// ── Supabase save helpers ──────────────────────────────
+async function sbSaveRate(r) {
+  if (!USE_SUPABASE) { saveDB(); return; }
+  const row = { carrier: r.carrier, mode: r.mode, origin: r.origin, dest: r.dest, rate: r.rate, currency: r.currency, unit: r.unit, valid_until: r.validUntil||null, notes: r.notes||'', created_at: r.createdAt };
+  if (r.id && !r.id.startsWith('r')) {
+    await sbUpdate('rates', r.id, row);
+  } else {
+    const res = await sbInsert('rates', row);
+    r.id = String(res[0].id);
+  }
+  saveDB();
+}
+
+async function sbSaveQuote(q) {
+  if (!USE_SUPABASE) { saveDB(); return; }
+  const row = {
+    number: q.number, client: q.client, origin: q.origin, dest: q.dest,
+    mode: q.mode, incoterm: q.incoterm, owner: q.owner,
+    valid_from: q.validFrom||null, valid_to: q.validTo||null,
+    notes: q.notes||'', status: q.status||'draft', margin: q.margin||0,
+    line_items: JSON.stringify(q.lineItems||[]),
+    created_at: q.createdAt
+  };
+  if (q.id && !q.id.startsWith('q')) {
+    await sbUpdate('quotes', q.id, row);
+  } else {
+    const res = await sbInsert('quotes', row);
+    q.id = String(res[0].id);
+  }
+  saveDB();
+}
+
+async function sbSaveContact(c) {
+  if (!USE_SUPABASE) { saveDB(); return; }
+  const row = { name: c.name, type: c.type, contact: c.contact||'', email: c.email||'', phone: c.phone||'', notes: c.notes||'', is_problem: c.isProblem||false, zip_coverage: c.zipCoverage||'' };
+  if (c.id && !c.id.startsWith('c')) {
+    await sbUpdate('contacts', c.id, row);
+  } else {
+    const res = await sbInsert('contacts', row);
+    c.id = String(res[0].id);
+  }
+  saveDB();
+}
+
+async function sbSaveIntel(i) {
+  if (!USE_SUPABASE) { saveDB(); return; }
+  const row = { type: i.type, subject: i.subject, flag: i.flag, details: i.details, created_at: i.createdAt };
+  if (i.id && !i.id.startsWith('i')) {
+    await sbUpdate('intel', i.id, row);
+  } else {
+    const res = await sbInsert('intel', row);
+    i.id = String(res[0].id);
+  }
+  saveDB();
+}
+
+async function sbSaveSettings() {
+  if (!USE_SUPABASE) { saveDB(); return; }
+  await sbUpsert('settings', { id: 1, data: JSON.stringify(db.settings) });
+  saveDB();
+}
+
+async function sbDeleteRecord(table, id) {
+  if (!USE_SUPABASE) { saveDB(); return; }
+  if (id && !id.match(/^[rqci]\d/)) await sbDelete(table, id);
+  saveDB();
+}
+
+function initDB() {
+  const today = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate()+n); return r; };
+  const subDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate()-n); return r; };
+
+  return {
+    rates: [
+      { id: 'r1', mode: 'ocean', carrier: 'Maersk Line', origin: 'Los Angeles, CA', dest: 'Shanghai, CN', rate: 2450, currency: 'USD', unit: '20ft', validUntil: fmt(addDays(today, 45)), notes: 'BAF included', createdAt: fmt(subDays(today,5)) },
+      { id: 'r2', mode: 'ocean', carrier: 'Maersk Line', origin: 'Los Angeles, CA', dest: 'Shanghai, CN', rate: 3800, currency: 'USD', unit: '40HC', validUntil: fmt(addDays(today, 45)), notes: 'BAF included', createdAt: fmt(subDays(today,5)) },
+      { id: 'r3', mode: 'ocean', carrier: 'COSCO Shipping', origin: 'Long Beach, CA', dest: 'Ningbo, CN', rate: 2200, currency: 'USD', unit: '20ft', validUntil: fmt(addDays(today, 20)), notes: '', createdAt: fmt(subDays(today,30)) },
+      { id: 'r4', mode: 'air', carrier: 'American Airlines Cargo', origin: 'LAX', dest: 'PVG', rate: 4.80, currency: 'USD', unit: 'per KG', validUntil: fmt(addDays(today, 15)), notes: 'Min 100kg', createdAt: fmt(subDays(today,3)) },
+      { id: 'r5', mode: 'trucking', carrier: 'Pacific Drayage LLC', origin: 'Long Beach, CA', dest: 'Inland Empire, CA', rate: 650, currency: 'USD', unit: 'per lane', validUntil: fmt(addDays(today, 60)), notes: '', createdAt: fmt(subDays(today,10)) },
+      { id: 'r6', mode: 'trucking', carrier: 'Pacific Drayage LLC', origin: 'Los Angeles, CA', dest: 'Long Beach Port', rate: 285, currency: 'USD', unit: 'per lane', validUntil: fmt(addDays(today, 60)), notes: 'Drop-hook available', createdAt: fmt(subDays(today,10)) },
+      { id: 'r7', mode: 'brokerage', carrier: 'Pacific Customs Brokers', origin: 'Any US Port', dest: 'Any US Port', rate: 175, currency: 'USD', unit: 'per shipment', validUntil: fmt(addDays(today, 180)), notes: 'ISF filing $75 extra', createdAt: fmt(subDays(today,60)) },
+      { id: 'r8', mode: 'ocean', carrier: 'Hapag-Lloyd', origin: 'Hamburg, DE', dest: 'New York, NY', rate: 1850, currency: 'EUR', unit: '20ft', validUntil: fmt(subDays(today, 5)), notes: 'PSS included', createdAt: fmt(subDays(today,50)) },
+    ],
+    quotes: [
+      { id: 'q1', number: 'QT-2025-001', client: 'Acme Imports LLC', origin: 'Los Angeles, CA', dest: 'Shanghai, CN', mode: 'ocean', incoterm: 'FOB', owner: 'Alex Chen', createdAt: fmt(subDays(today,3)), validFrom: fmt(today), validTo: fmt(addDays(today,30)), notes: 'Subject to space availability', status: 'sent', margin: 12,
+        lineItems: [
+          { id:'li1', category:'freight', description:'Ocean Freight 40HC', qty:1, rate:3800, currency:'USD', totalUSD:3800, marginPct:12, isPassthrough:false },
+          { id:'li2', category:'surcharge', description:'Bunker Adjustment Factor', qty:1, rate:450, currency:'USD', totalUSD:450, marginPct:0, isPassthrough:true },
+          { id:'li3', category:'customs', description:'Customs Brokerage', qty:1, rate:175, currency:'USD', totalUSD:175, marginPct:0, isPassthrough:true },
+          { id:'li4', category:'other', description:'ISF Filing', qty:1, rate:75, currency:'USD', totalUSD:75, marginPct:0, isPassthrough:true },
+        ]
+      },
+      { id: 'q2', number: 'QT-2025-002', client: 'Sunset Trading Co', origin: 'LAX', dest: 'Frankfurt, DE', mode: 'air', incoterm: 'CIF', owner: 'Maria Rodriguez', createdAt: fmt(subDays(today,1)), validFrom: fmt(today), validTo: fmt(addDays(today,7)), notes: '', status: 'draft', margin: 15,
+        lineItems: [
+          { id:'li5', category:'freight', description:'Air Freight 500kg @ $4.80/kg', qty:500, rate:4.80, currency:'USD', totalUSD:2400, marginPct:15, isPassthrough:false },
+          { id:'li6', category:'other', description:'Fuel Surcharge', qty:1, rate:320, currency:'USD', totalUSD:320, marginPct:0, isPassthrough:true },
+        ]
+      },
+    ],
+    contacts: [
+      { id: 'c1', name: 'Maersk Line', type: 'ocean_carrier', contact: 'David Kim', email: 'rates@maersk.com', phone: '+1 310 555 0100', notes: '', isProblem: false },
+      { id: 'c2', name: 'COSCO Shipping', type: 'ocean_carrier', contact: 'Jenny Wu', email: 'jenny.wu@cosco.com', phone: '+1 562 555 0200', notes: '', isProblem: false },
+      { id: 'c3', name: 'Pacific Drayage LLC', type: 'trucker', contact: 'Mike Torres', email: 'ops@pacificdrayage.com', phone: '+1 909 555 0300', notes: 'Fast response', isProblem: false, zipCoverage: '90001-92899' },
+      { id: 'c4', name: 'American Airlines Cargo', type: 'air_carrier', contact: 'Sarah Johnson', email: 'cargo@aa.com', phone: '+1 800 555 0400', notes: '', isProblem: false },
+      { id: 'c5', name: 'Pacific Customs Brokers', type: 'broker', contact: 'Lisa Chan', email: 'lisa@pacificbrokers.com', phone: '+1 424 555 0500', notes: 'ISF specialist', isProblem: false },
+      { id: 'c6', name: 'Acme Imports LLC', type: 'client', contact: 'Robert Smith', email: 'rsmith@acme.com', phone: '+1 213 555 0600', notes: '', isProblem: false },
+      { id: 'c7', name: 'Sunset Trading Co', type: 'client', contact: 'Amy Chen', email: 'amy@sunsettrading.com', phone: '+1 310 555 0700', notes: 'Prefers air for urgent', isProblem: false },
+    ],
+    intel: [
+      { id: 'i1', type: 'country', subject: 'China', flag: 'always_include', details: 'Always include ISF filing ($75) and OBL fee on all China origin shipments.', createdAt: fmt(today) },
+      { id: 'i2', type: 'port', subject: 'Long Beach', flag: 'often_missed', details: 'Chassis split fee frequently missed — add $75–$150 depending on trucker.', createdAt: fmt(today) },
+      { id: 'i3', type: 'lane', subject: 'Trans-Pacific', flag: 'warning', details: 'PSS (Peak Season Surcharge) applies May–Oct. Always verify with carrier before quoting.', createdAt: fmt(today) },
+    ],
+    settings: {
+      margins: { ocean: 12, air: 15, trucking: 10, lclDest: 8, problemPremium: 5 },
+      passthroughs: ['BAF', 'PSS', 'GRI', 'ISF Filing', 'OBL Fee', 'EXW Pickup', 'Customs Brokerage', 'Port Terminal Fee'],
+      teamMembers: ['Alex Chen', 'Maria Rodriguez', 'James Park', 'Sarah Liu', 'Tom Walsh'],
+    },
+    quoteCounter: 3,
+    rateCounter: 9,
+    contactCounter: 8,
+    intelCounter: 4,
+  };
+}
+
+let db = loadDB();
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const nav = document.querySelector(`[onclick="showPage('${id}')"]`);
+  if (nav) nav.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'rates') renderRates();
+  if (id === 'history') renderHistory();
+  if (id === 'contacts') renderContacts();
+  if (id === 'builder') initBuilder();
+  if (id === 'settings') renderSettings();
+  if (id === 'training') renderTraining();
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+
+function toast(msg, type = '') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+
+function uid(prefix) { return prefix + Date.now() + Math.random().toString(36).slice(2,6); }
+
+function fmtMoney(n, cur='USD') {
+  if (cur === 'USD') return '$' + parseFloat(n||0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  return parseFloat(n||0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' ' + cur;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const diff = new Date(dateStr + 'T12:00:00') - new Date();
+  return Math.round(diff / (1000*60*60*24));
+}
+
+function rateStatus(r) {
+  const d = daysUntil(r.validUntil);
+  if (d === null) return {label:'No expiry', cls:'badge-gray'};
+  if (d < 0) return {label:'Expired', cls:'badge-red'};
+  if (d <= 14) return {label:`Expires in ${d}d`, cls:'badge-red'};
+  if (d <= 45) return {label:`${d}d left`, cls:'badge-orange'};
+  return {label:`Valid ${fmtDate(r.validUntil)}`, cls:'badge-green'};
+}
+
+function modeIcon(m) {
+  return {ocean:'🌊', air:'✈️', trucking:'🚛', brokerage:'📑', multimodal:'🔀'}[m] || '📦';
+}
+
+function modeBadgeClass(m) {
+  return {ocean:'badge-blue', air:'badge-orange', trucking:'badge-red', brokerage:'badge-gray', multimodal:'badge-green'}[m] || 'badge-gray';
+}
+
+// Exchange rates (approximate, static)
+const FX = { USD:1, EUR:1.08, CNY:0.138, GBP:1.27, HKD:0.128, JPY:0.0066, SGD:0.74, AUD:0.65 };
+
+function toUSD(amount, currency) {
+  return parseFloat(amount||0) * (FX[currency] || 1);
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+
+function renderDashboard() {
+  const today = new Date();
+  const thisMonth = db.quotes.filter(q => {
+    const d = new Date(q.createdAt);
+    return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+  });
+  const expiringRates = db.rates.filter(r => {
+    const d = daysUntil(r.validUntil);
+    return d !== null && d >= 0 && d <= 30;
+  });
+  const expiredRates = db.rates.filter(r => daysUntil(r.validUntil) < 0);
+
+  document.getElementById('dashboard-stats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Quotes This Month</div>
+      <div class="stat-value">${thisMonth.length}</div>
+      <div class="stat-sub">${db.quotes.length} total all time</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Rate Library</div>
+      <div class="stat-value">${db.rates.length}</div>
+      <div class="stat-sub">${db.rates.filter(r=>r.mode==='ocean').length} ocean · ${db.rates.filter(r=>r.mode==='air').length} air · ${db.rates.filter(r=>r.mode==='trucking').length} trucking</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Expiring Soon</div>
+      <div class="stat-value" style="color:var(--orange)">${expiringRates.length}</div>
+      <div class="stat-sub">Rates expiring within 30 days</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Carriers & Clients</div>
+      <div class="stat-value">${db.contacts.length}</div>
+      <div class="stat-sub">${db.contacts.filter(c=>c.type!=='client').length} carriers · ${db.contacts.filter(c=>c.type==='client').length} clients</div>
+    </div>
+  `;
+
+  // Recent quotes
+  const recent = [...db.quotes].sort((a,b) => b.createdAt.localeCompare(a.createdAt)).slice(0,5);
+  document.getElementById('dashboard-quotes-body').innerHTML = recent.length
+    ? recent.map(q => {
+        const sub = q.lineItems.reduce((s,li)=>s+li.totalUSD,0);
+        const total = sub * (1 + (q.margin||0)/100);
+        return `<tr>
+          <td><span class="mono font-medium" style="color:var(--blue)">${q.number}</span></td>
+          <td>${q.client}</td>
+          <td style="color:var(--label3);font-size:12.5px">${q.origin} → ${q.dest}</td>
+          <td class="mono font-semibold">${fmtMoney(total)}</td>
+          <td style="color:var(--label3);font-size:12.5px">${fmtDate(q.createdAt)}</td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="5" style="text-align:center;color:var(--label3);padding:24px">No quotes yet</td></tr>';
+
+  // Alerts
+  const alerts = [];
+  expiredRates.forEach(r => alerts.push(`<div style="padding:10px 12px;background:var(--red-light);border-radius:8px;margin-bottom:8px;font-size:13px">
+    <strong style="color:var(--red)">⚠ Expired</strong> — ${r.carrier} ${modeIcon(r.mode)} ${r.origin} → ${r.dest} <span style="color:var(--label3)">(${r.unit})</span>
+  </div>`));
+  expiringRates.forEach(r => alerts.push(`<div style="padding:10px 12px;background:var(--orange-light);border-radius:8px;margin-bottom:8px;font-size:13px">
+    <strong style="color:var(--orange)">⏰ Expiring in ${daysUntil(r.validUntil)}d</strong> — ${r.carrier} ${modeIcon(r.mode)} ${r.origin} → ${r.dest}
+  </div>`));
+  document.getElementById('rate-alerts-body').innerHTML = alerts.length
+    ? alerts.join('')
+    : '<div style="color:var(--label3);text-align:center;padding:24px;font-size:13px">✅ All rates are current</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// RATE LIBRARY
+// ═══════════════════════════════════════════════════════
+
+let rateFilter = 'all';
+
+function setRateFilter(f, btn) {
+  rateFilter = f;
+  document.querySelectorAll('.active-filter').forEach(b => b.classList.remove('active-filter'));
+  btn.classList.add('active-filter');
+  renderRates();
+}
+
+function filterRates() { renderRates(); }
+
+function renderRates() {
+  const q = (document.getElementById('rate-search')?.value || '').toLowerCase();
+  let rates = db.rates;
+  if (rateFilter !== 'all') rates = rates.filter(r => r.mode === rateFilter);
+  if (q) rates = rates.filter(r =>
+    [r.carrier, r.origin, r.dest, r.notes, r.unit].join(' ').toLowerCase().includes(q)
+  );
+
+  const tbody = document.getElementById('rates-table-body');
+  if (!rates.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--label3);padding:32px">No rates found</td></tr>';
+    return;
+  }
+
+  const today = new Date();
+  tbody.innerHTML = rates.map(r => {
+    const st = rateStatus(r);
+    const warning = daysUntil(r.validUntil) >= 46 ? '' :
+      daysUntil(r.validUntil) >= 0 ?
+      `<div class="rate-warning">⏰ Needs confirmation soon</div>` :
+      `<div class="rate-warning" style="color:var(--red)">⚠ Expired — verify before use</div>`;
+    return `<tr>
+      <td><span class="badge ${modeBadgeClass(r.mode)}">${modeIcon(r.mode)} ${r.mode}</span></td>
+      <td><span class="font-medium">${r.carrier}</span></td>
+      <td>${r.origin}</td>
+      <td>${r.dest}</td>
+      <td class="mono font-semibold">${fmtMoney(r.rate, r.currency)}</td>
+      <td><span class="badge badge-gray">${r.currency}</span></td>
+      <td style="color:var(--label3);font-size:12.5px">${r.unit}</td>
+      <td style="font-size:12.5px">${fmtDate(r.validUntil)}</td>
+      <td>
+        <span class="badge ${st.cls}">${st.label}</span>
+        ${warning}
+      </td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="deleteRate('${r.id}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function deleteRate(id) {
+  if (!confirm('Delete this rate?')) return;
+  db.rates = db.rates.filter(r => r.id !== id);
+  await sbDeleteRecord('rates', id);
+  renderRates();
+  toast('Rate deleted');
+}
+
+async function saveManualRate() {
+  const r = {
+    id: 'r' + db.rateCounter++,
+    mode: document.getElementById('ar-mode').value,
+    carrier: document.getElementById('ar-carrier').value.trim(),
+    origin: document.getElementById('ar-origin').value.trim(),
+    dest: document.getElementById('ar-dest').value.trim(),
+    rate: parseFloat(document.getElementById('ar-rate').value) || 0,
+    currency: document.getElementById('ar-currency').value,
+    unit: document.getElementById('ar-unit').value,
+    validUntil: document.getElementById('ar-valid').value,
+    notes: document.getElementById('ar-notes').value.trim(),
+    createdAt: new Date().toISOString().split('T')[0],
+  };
+  if (!r.carrier || !r.origin || !r.dest) { toast('Please fill required fields', 'error'); return; }
+  db.rates.push(r);
+  await sbSaveRate(r);
+  closeModal('add-rate-modal');
+  renderRates();
+  toast('Rate saved to library ✓', 'success');
+}
+
+// ═══════════════════════════════════════════════════════
+// EMAIL PARSER
+// ═══════════════════════════════════════════════════════
+
+let parsedData = null;
+
+async function parseEmail() {
+  const text = document.getElementById('email-paste-area').value.trim();
+  if (!text) { toast('Please paste email content first', 'error'); return; }
+
+  document.getElementById('parse-results').style.display = 'none';
+  document.getElementById('parse-loading').style.display = 'block';
+  const btn = document.getElementById('parse-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Parsing…';
+
+  try {
+    const carriers = db.contacts.map(c => c.name).join(', ');
+    const prompt = `You are a freight rate parser. Extract structured rate information from the following carrier email.
+
+Known carriers/companies in our system: ${carriers}
+
+Return ONLY a JSON object with this exact structure:
+{
+  "mode": "ocean|air|trucking|brokerage",
+  "carrier": "carrier name (fuzzy match to known carriers if possible)",
+  "origin": "city, country/state",
+  "destination": "city, country/state",
+  "contactName": "contact person if found",
+  "contactEmail": "email if found",
+  "validFrom": "YYYY-MM-DD or null",
+  "validUntil": "YYYY-MM-DD or null",
+  "notes": "any special conditions, surcharges info",
+  "lines": [
+    {
+      "description": "rate description",
+      "amount": 1234.56,
+      "currency": "USD",
+      "unit": "20ft|40ft|40HC|per CBM|per KG|per shipment|per mile|per lane"
+    }
+  ]
+}
+
+EMAIL:
+${text}`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content[0].text;
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON found in response');
+    parsedData = JSON.parse(jsonMatch[0]);
+    renderParsedData(parsedData);
+
+  } catch(e) {
+    console.error(e);
+    toast('Failed to parse email. Check console.', 'error');
+    document.getElementById('parse-loading').style.display = 'none';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✦ Parse with AI';
+}
+
+function renderParsedData(d) {
+  document.getElementById('parse-loading').style.display = 'none';
+  document.getElementById('parse-results').style.display = 'block';
+
+  document.getElementById('parsed-mode-badge').innerHTML =
+    `<span class="badge ${modeBadgeClass(d.mode)}">${modeIcon(d.mode)} ${d.mode}</span>`;
+
+  const fields = [
+    { label: 'Carrier', key: 'carrier', val: d.carrier },
+    { label: 'Origin', key: 'origin', val: d.origin },
+    { label: 'Destination', key: 'destination', val: d.destination },
+    { label: 'Contact', key: 'contactName', val: d.contactName || '—' },
+    { label: 'Email', key: 'contactEmail', val: d.contactEmail || '—' },
+    { label: 'Valid From', key: 'validFrom', val: d.validFrom || '—' },
+    { label: 'Valid Until', key: 'validUntil', val: d.validUntil || '—' },
+    { label: 'Notes', key: 'notes', val: d.notes || '—' },
+  ];
+
+  document.getElementById('parsed-fields').innerHTML = fields.map(f => `
+    <div class="parsed-field">
+      <span class="parsed-field-label">${f.label}</span>
+      <span class="parsed-field-value" contenteditable="true" data-key="${f.key}"
+        onblur="updateParsedField('${f.key}',this.textContent)">${f.val}</span>
+    </div>
+  `).join('');
+
+  // Render lines
+  if (d.lines && d.lines.length) {
+    document.getElementById('parsed-line-items-card').style.display = 'block';
+    document.getElementById('parsed-lines-body').innerHTML = d.lines.map((l,i) => `
+      <tr>
+        <td><input class="form-input" value="${l.description}" style="width:100%" oninput="parsedData.lines[${i}].description=this.value"></td>
+        <td><input class="amount-input" value="${l.amount}" oninput="parsedData.lines[${i}].amount=parseFloat(this.value)||0"></td>
+        <td>
+          <select class="currency-select" onchange="parsedData.lines[${i}].currency=this.value">
+            ${['USD','EUR','CNY','GBP','HKD','JPY','SGD','AUD'].map(c=>`<option${c===l.currency?' selected':''}>${c}</option>`).join('')}
+          </select>
+        </td>
+        <td>
+          <select class="currency-select" onchange="parsedData.lines[${i}].unit=this.value" style="width:100px">
+            ${['20ft','40ft','40HC','per CBM','per KG','per shipment','per mile','per lane'].map(u=>`<option${u===l.unit?' selected':''}>${u}</option>`).join('')}
+          </select>
+        </td>
+        <td><button class="btn btn-ghost btn-sm" onclick="removeParsedLine(${i})">🗑</button></td>
+      </tr>
+    `).join('');
+  }
+}
+
+function updateParsedField(key, val) {
+  if (parsedData) parsedData[key] = val.trim();
+}
+
+function addParsedLine() {
+  if (!parsedData) return;
+  parsedData.lines.push({ description: 'New charge', amount: 0, currency: 'USD', unit: 'per shipment' });
+  renderParsedData(parsedData);
+}
+
+function removeParsedLine(i) {
+  if (!parsedData) return;
+  parsedData.lines.splice(i, 1);
+  renderParsedData(parsedData);
+}
+
+function clearParse() {
+  parsedData = null;
+  document.getElementById('email-paste-area').value = '';
+  document.getElementById('parse-results').style.display = 'none';
+}
+
+async function saveToRateLibrary() {
+  if (!parsedData) return;
+  const lines = parsedData.lines || [];
+  if (!lines.length) lines.push({ description: 'Rate', amount: 0, currency: 'USD', unit: 'per shipment' });
+
+  for (const l of lines) {
+    const r = {
+      id: 'r' + db.rateCounter++,
+      mode: parsedData.mode || 'other',
+      carrier: parsedData.carrier || 'Unknown',
+      origin: parsedData.origin || '',
+      dest: parsedData.destination || '',
+      rate: l.amount,
+      currency: l.currency,
+      unit: l.unit,
+      validUntil: parsedData.validUntil || '',
+      notes: l.description + (parsedData.notes ? ' | ' + parsedData.notes : ''),
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+    db.rates.push(r);
+    await sbSaveRate(r);
+  }
+
+  if (parsedData.carrier && parsedData.contactEmail) {
+    const existing = db.contacts.find(c => c.name.toLowerCase().includes(parsedData.carrier.toLowerCase().slice(0,6)));
+    if (!existing) {
+      const c = {
+        id: 'c' + db.contactCounter++,
+        name: parsedData.carrier,
+        type: parsedData.mode === 'trucking' ? 'trucker' : parsedData.mode === 'air' ? 'air_carrier' : parsedData.mode === 'brokerage' ? 'broker' : 'ocean_carrier',
+        contact: parsedData.contactName || '',
+        email: parsedData.contactEmail || '',
+        phone: '',
+        notes: 'Added via email parse',
+        isProblem: false,
+      };
+      db.contacts.push(c);
+      await sbSaveContact(c);
+    }
+  }
+
+  clearParse();
+  toast(`${lines.length} rate(s) saved to library ✓`, 'success');
+  showPage('rates');
+}
+
+// ═══════════════════════════════════════════════════════
+// QUOTE BUILDER
+// ═══════════════════════════════════════════════════════
+
+let currentQuoteId = null;
+let lineItems = [];
+
+function initBuilder(quoteId) {
+  currentQuoteId = quoteId || null;
+  const today = new Date().toISOString().split('T')[0];
+  const future = new Date(); future.setDate(future.getDate()+30);
+  const futureStr = future.toISOString().split('T')[0];
+
+  if (quoteId) {
+    const q = db.quotes.find(x => x.id === quoteId);
+    if (!q) return;
+    document.getElementById('q-client').value = q.client;
+    document.getElementById('q-origin').value = q.origin;
+    document.getElementById('q-dest').value = q.dest;
+    document.getElementById('q-mode').value = q.mode;
+    document.getElementById('q-incoterm').value = q.incoterm;
+    document.getElementById('q-valid-from').value = q.validFrom || today;
+    document.getElementById('q-valid-to').value = q.validTo || futureStr;
+    document.getElementById('q-notes').value = q.notes || '';
+    document.getElementById('q-owner').value = q.owner;
+    document.getElementById('q-margin').value = q.margin || 10;
+    lineItems = q.lineItems ? q.lineItems.map(li => ({...li})) : [];
+    document.getElementById('builder-title').textContent = 'Edit Quote';
+    document.getElementById('quote-number-display').textContent = q.number;
+  } else {
+    document.getElementById('q-client').value = '';
+    document.getElementById('q-origin').value = '';
+    document.getElementById('q-dest').value = '';
+    document.getElementById('q-mode').value = 'ocean';
+    document.getElementById('q-incoterm').value = 'FOB';
+    document.getElementById('q-valid-from').value = today;
+    document.getElementById('q-valid-to').value = futureStr;
+    document.getElementById('q-notes').value = '';
+    document.getElementById('q-owner').value = 'Alex Chen';
+    document.getElementById('q-margin').value = 10;
+    lineItems = [];
+    document.getElementById('builder-title').textContent = 'New Quote';
+    document.getElementById('quote-number-display').textContent = `QT-${new Date().getFullYear()}-${String(db.quoteCounter).padStart(3,'0')}`;
+  }
+
+  document.getElementById('suggested-rates').innerHTML = '';
+  renderLineItems();
+}
+
+function updateQuoteTitle() {
+  const client = document.getElementById('q-client').value;
+  if (client && !currentQuoteId) {
+    document.getElementById('builder-title').textContent = `Quote — ${client}`;
+  }
+}
+
+function addLineItem(category, description) {
+  lineItems.push({
+    id: uid('li'),
+    category,
+    description: description || '',
+    qty: 1,
+    rate: 0,
+    currency: 'USD',
+    totalUSD: 0,
+  });
+  renderLineItems();
+}
+
+function removeLineItem(id) {
+  lineItems = lineItems.filter(li => li.id !== id);
+  renderLineItems();
+}
+
+function renderLineItems() {
+  const catColors = { freight:'badge-blue', surcharge:'badge-orange', customs:'badge-red', other:'badge-gray' };
+
+  document.getElementById('line-items-body').innerHTML = lineItems.length
+    ? lineItems.map(li => `
+      <tr class="line-item-row">
+        <td><span class="badge ${catColors[li.category]||'badge-gray'} text-sm">${li.category}</span></td>
+        <td><input class="form-input" style="min-width:200px" value="${li.description}"
+          oninput="updateLI('${li.id}','description',this.value)"></td>
+        <td><input class="amount-input" style="width:60px;text-align:center" type="number" min="0" value="${li.qty}"
+          oninput="updateLI('${li.id}','qty',parseFloat(this.value)||1)"></td>
+        <td><input class="amount-input" type="number" min="0" value="${li.rate}"
+          oninput="updateLI('${li.id}','rate',parseFloat(this.value)||0)"></td>
+        <td>
+          <select class="currency-select" onchange="updateLI('${li.id}','currency',this.value)">
+            ${['USD','EUR','CNY','GBP','HKD','JPY','SGD','AUD'].map(c=>`<option${c===li.currency?' selected':''}>${c}</option>`).join('')}
+          </select>
+        </td>
+        <td class="mono font-semibold" id="li-total-${li.id}">${fmtMoney(li.totalUSD)}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="removeLineItem('${li.id}')">🗑</button></td>
+      </tr>
+    `).join('')
+    : `<tr><td colspan="7" style="text-align:center;color:var(--label3);padding:32px;font-size:13px">
+        No line items yet. Click the buttons above to add charges.
+      </td></tr>`;
+
+  recalcTotals();
+}
+
+function updateLI(id, field, val) {
+  const li = lineItems.find(x => x.id === id);
+  if (!li) return;
+  li[field] = val;
+  li.totalUSD = toUSD(li.qty * li.rate, li.currency);
+  const el = document.getElementById('li-total-'+id);
+  if (el) el.textContent = fmtMoney(li.totalUSD);
+  recalcTotals();
+}
+
+function recalcTotals() {
+  const sub = lineItems.reduce((s,li) => s + (li.totalUSD||0), 0);
+  const margin = parseFloat(document.getElementById('q-margin')?.value||0);
+  const marginAmt = sub * margin / 100;
+  const total = sub + marginAmt;
+  document.getElementById('q-subtotal').textContent = fmtMoney(sub);
+  document.getElementById('q-margin-amt').textContent = fmtMoney(marginAmt);
+  document.getElementById('q-total').textContent = fmtMoney(total);
+}
+
+function suggestRates() {
+  const origin = document.getElementById('q-origin').value.trim().toLowerCase();
+  const dest = document.getElementById('q-dest').value.trim().toLowerCase();
+  const mode = document.getElementById('q-mode').value;
+
+  const matches = db.rates.filter(r => {
+    const modeOk = mode === 'multimodal' || r.mode === mode;
+    const originOk = !origin || r.origin.toLowerCase().includes(origin.slice(0,4)) || origin.includes(r.origin.toLowerCase().slice(0,4));
+    const destOk = !dest || r.dest.toLowerCase().includes(dest.slice(0,4)) || dest.includes(r.dest.toLowerCase().slice(0,4));
+    return modeOk && (originOk || destOk);
+  }).slice(0, 8);
+
+  const container = document.getElementById('suggested-rates');
+  if (!matches.length) {
+    container.innerHTML = '<div style="font-size:12.5px;color:var(--label3);padding:8px 0">No matching rates found in library.</div>';
+    return;
+  }
+
+  container.innerHTML = matches.map(r => {
+    const st = rateStatus(r);
+    return `<div style="border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;transition:all 0.15s"
+      onmouseenter="this.style.borderColor='var(--blue)'" onmouseleave="this.style.borderColor='var(--border)'"
+      onclick="addRateAsLineItem('${r.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:12.5px;font-weight:600">${r.carrier}</span>
+        <span class="badge ${st.cls}" style="font-size:10px">${st.label}</span>
+      </div>
+      <div style="font-size:12px;color:var(--label3)">${r.origin} → ${r.dest}</div>
+      <div style="font-size:13px;font-family:'DM Mono',monospace;font-weight:600;margin-top:4px;color:var(--blue)">
+        ${fmtMoney(r.rate, r.currency)} / ${r.unit}
+      </div>
+      <div style="font-size:11px;color:var(--green);margin-top:4px">+ Click to add</div>
+    </div>`;
+  }).join('');
+}
+
+function addRateAsLineItem(rateId) {
+  const r = db.rates.find(x => x.id === rateId);
+  if (!r) return;
+  lineItems.push({
+    id: uid('li'),
+    category: r.mode === 'customs' || r.mode === 'brokerage' ? 'customs' : 'freight',
+    description: `${r.carrier} — ${r.origin} → ${r.dest} (${r.unit})`,
+    qty: 1,
+    rate: r.rate,
+    currency: r.currency,
+    totalUSD: toUSD(r.rate, r.currency),
+  });
+  renderLineItems();
+  toast(`Added ${r.carrier} rate ✓`, 'success');
+}
+
+async function saveQuote() {
+  const client = document.getElementById('q-client').value.trim();
+  if (!client) { toast('Please enter a client name', 'error'); return; }
+  if (!lineItems.length) { toast('Please add at least one line item', 'error'); return; }
+
+  if (currentQuoteId) {
+    const q = db.quotes.find(x => x.id === currentQuoteId);
+    Object.assign(q, buildQuoteObj());
+    await sbSaveQuote(q);
+    toast('Quote updated ✓', 'success');
+  } else {
+    const num = `QT-${new Date().getFullYear()}-${String(db.quoteCounter++).padStart(3,'0')}`;
+    const q = { id: uid('q'), number: num, ...buildQuoteObj(), createdAt: new Date().toISOString().split('T')[0], status: 'draft' };
+    db.quotes.push(q);
+    await sbSaveQuote(q);
+    toast('Quote saved ✓', 'success');
+  }
+  showPage('history');
+}
+
+function buildQuoteObj() {
+  const total = lineItems.reduce((s,li) => s + liTotal(li), 0);
+  const cost = lineItems.reduce((s,li) => s + toUSD(li.qty*li.rate, li.currency), 0);
+  const marginPct = cost > 0 ? Math.round((total - cost) / cost * 100 * 10) / 10 : 0;
+  return {
+    client: document.getElementById('q-client').value.trim(),
+    origin: document.getElementById('q-origin').value.trim(),
+    dest: document.getElementById('q-dest').value.trim(),
+    mode: document.getElementById('q-mode').value,
+    incoterm: document.getElementById('q-incoterm').value,
+    owner: document.getElementById('q-owner').value,
+    validFrom: document.getElementById('q-valid-from').value,
+    validTo: document.getElementById('q-valid-to').value,
+    notes: document.getElementById('q-notes').value.trim(),
+    margin: marginPct,
+    lineItems: lineItems.map(li => ({...li})),
+  };
+}
+
+function previewQuote() {
+  const client = document.getElementById('q-client').value.trim() || 'Client';
+  const origin = document.getElementById('q-origin').value.trim() || '—';
+  const dest = document.getElementById('q-dest').value.trim() || '—';
+  const mode = document.getElementById('q-mode').value;
+  const incoterm = document.getElementById('q-incoterm').value;
+  const owner = document.getElementById('q-owner').value;
+  const notes = document.getElementById('q-notes').value.trim();
+  const margin = parseFloat(document.getElementById('q-margin').value||0);
+  const validFrom = document.getElementById('q-valid-from').value;
+  const validTo = document.getElementById('q-valid-to').value;
+  const qNum = document.getElementById('quote-number-display').textContent;
+  const sub = lineItems.reduce((s,li) => s + li.totalUSD, 0);
+  const marginAmt = sub * margin / 100;
+  const total = sub + marginAmt;
+
+  document.getElementById('preview-content').innerHTML = `
+    <div class="quote-preview-header" style="background:var(--label);color:var(--bg);padding:28px 32px;border-radius:10px 10px 0 0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin-bottom:6px">Freight Quote</div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;opacity:0.6">${qNum}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;opacity:0.6">Prepared by ${owner}</div>
+          <div style="font-size:13px;opacity:0.6;margin-top:4px">Valid ${fmtDate(validFrom)} – ${fmtDate(validTo)}</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);padding:20px 32px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;border-bottom:1px solid var(--border)">
+      <div><div style="font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;color:var(--label3);margin-bottom:4px">Client</div><div style="font-weight:600">${client}</div></div>
+      <div><div style="font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;color:var(--label3);margin-bottom:4px">Lane</div><div>${origin} → ${dest}</div></div>
+      <div><div style="font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;color:var(--label3);margin-bottom:4px">Mode / Terms</div><div>${modeIcon(mode)} ${mode} · ${incoterm}</div></div>
+    </div>
+    <div style="padding:24px 32px">
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+        <thead><tr>
+          <th style="text-align:left;font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;color:var(--label3);padding:8px 0;border-bottom:2px solid var(--border)">Description</th>
+          <th style="text-align:right;font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;color:var(--label3);padding:8px 0;border-bottom:2px solid var(--border)">Qty</th>
+          <th style="text-align:right;font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;color:var(--label3);padding:8px 0;border-bottom:2px solid var(--border)">Rate</th>
+          <th style="text-align:right;font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;color:var(--label3);padding:8px 0;border-bottom:2px solid var(--border)">Total (USD)</th>
+        </tr></thead>
+        <tbody>
+          ${lineItems.map(li => `<tr>
+            <td style="padding:10px 0;border-bottom:1px solid var(--surface2)">${li.description}${li.currency !== 'USD' ? ` <span style="font-size:11px;color:var(--label3)">(${li.currency})</span>` : ''}</td>
+            <td style="text-align:right;padding:10px 0;border-bottom:1px solid var(--surface2);font-family:'DM Mono',monospace">${li.qty}</td>
+            <td style="text-align:right;padding:10px 0;border-bottom:1px solid var(--surface2);font-family:'DM Mono',monospace">${fmtMoney(li.rate, li.currency)}</td>
+            <td style="text-align:right;padding:10px 0;border-bottom:1px solid var(--surface2);font-family:'DM Mono',monospace;font-weight:600">${fmtMoney(li.totalUSD)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div style="border-top:2px solid var(--label);padding-top:12px;text-align:right">
+        <div style="font-size:13px;color:var(--label3);margin-bottom:4px">Subtotal: ${fmtMoney(sub)}</div>
+        <div style="font-size:13px;color:var(--label3);margin-bottom:8px">Margin (${margin}%): ${fmtMoney(marginAmt)}</div>
+        <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Total: ${fmtMoney(total)}</div>
+      </div>
+      ${notes ? `<div style="margin-top:20px;padding:14px 16px;background:var(--bg);border-radius:8px;font-size:13px;color:var(--label3)"><strong>Remarks:</strong> ${notes}</div>` : ''}
+    </div>
+  `;
+  openModal('preview-modal');
+}
+
+// ═══════════════════════════════════════════════════════
+// QUOTE HISTORY
+// ═══════════════════════════════════════════════════════
+
+let historyFilter = 'all';
+
+function setHistoryFilter(f, btn) {
+  historyFilter = f;
+  document.querySelectorAll('.filter-row .active-filter').forEach(b => b.classList.remove('active-filter'));
+  btn.classList.add('active-filter');
+  renderHistory();
+}
+
+function filterHistory() { renderHistory(); }
+
+function renderHistory() {
+  const q = (document.getElementById('history-search')?.value || '').toLowerCase();
+  let quotes = [...db.quotes].sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+  if (historyFilter !== 'all') quotes = quotes.filter(x => x.mode === historyFilter);
+  if (q) quotes = quotes.filter(x => [x.client, x.number, x.origin, x.dest, x.owner].join(' ').toLowerCase().includes(q));
+
+  const statusBadge = { draft:'badge-gray', sent:'badge-blue', accepted:'badge-green', declined:'badge-red' };
+
+  document.getElementById('history-table-body').innerHTML = quotes.length
+    ? quotes.map(q => {
+        const sub = q.lineItems.reduce((s,li) => s + li.totalUSD, 0);
+        const total = sub * (1 + (q.margin||0)/100);
+        return `<tr>
+          <td><span class="mono" style="color:var(--blue)">${q.number}</span></td>
+          <td><span class="font-medium">${q.client}</span></td>
+          <td style="color:var(--label3);font-size:12.5px">${q.origin} → ${q.dest}</td>
+          <td><span class="badge ${modeBadgeClass(q.mode)}">${modeIcon(q.mode)} ${q.mode}</span></td>
+          <td class="mono font-semibold">${fmtMoney(total)}</td>
+          <td style="font-size:12.5px">${q.owner}</td>
+          <td style="color:var(--label3);font-size:12.5px">${fmtDate(q.createdAt)}</td>
+          <td><span class="badge ${statusBadge[q.status]||'badge-gray'}">${q.status}</span></td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-ghost btn-sm" onclick="viewQuote('${q.id}')">👁</button>
+            <button class="btn btn-ghost btn-sm" onclick="editQuote('${q.id}')">✏️</button>
+            <button class="btn btn-ghost btn-sm" onclick="cloneQuoteById('${q.id}')">📋</button>
+          </td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="9" style="text-align:center;color:var(--label3);padding:40px">No quotes found</td></tr>';
+}
+
+let viewingQuoteId = null;
+
+function viewQuote(id) {
+  const q = db.quotes.find(x => x.id === id);
+  if (!q) return;
+  viewingQuoteId = id;
+  document.getElementById('view-quote-title').textContent = q.number;
+  document.getElementById('view-quote-sub').textContent = `${q.client} · ${q.origin} → ${q.dest}`;
+  const sub = q.lineItems.reduce((s,li) => s + li.totalUSD, 0);
+  const margin = q.margin || 0;
+  const total = sub * (1 + margin/100);
+
+  document.getElementById('view-quote-content').innerHTML = `
+    <div style="background:var(--surface2);padding:16px 20px;border-radius:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+      <div><div class="text-muted text-sm">Mode</div><div class="font-medium">${modeIcon(q.mode)} ${q.mode}</div></div>
+      <div><div class="text-muted text-sm">Incoterm</div><div class="font-medium">${q.incoterm}</div></div>
+      <div><div class="text-muted text-sm">Owner</div><div class="font-medium">${q.owner}</div></div>
+      <div><div class="text-muted text-sm">Created</div><div class="font-medium">${fmtDate(q.createdAt)}</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+      <thead><tr>
+        <th style="text-align:left;font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;color:var(--label3);padding:8px 12px;border-bottom:2px solid var(--border)">Description</th>
+        <th style="text-align:right;font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;color:var(--label3);padding:8px 12px;border-bottom:2px solid var(--border)">Qty</th>
+        <th style="text-align:right;font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;color:var(--label3);padding:8px 12px;border-bottom:2px solid var(--border)">Rate</th>
+        <th style="text-align:right;font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;color:var(--label3);padding:8px 12px;border-bottom:2px solid var(--border)">Total USD</th>
+      </tr></thead>
+      <tbody>
+        ${q.lineItems.map(li => `<tr>
+          <td style="padding:10px 12px;border-bottom:1px solid var(--surface2)">${li.description}</td>
+          <td style="text-align:right;padding:10px 12px;border-bottom:1px solid var(--surface2);font-family:'DM Mono',monospace">${li.qty}</td>
+          <td style="text-align:right;padding:10px 12px;border-bottom:1px solid var(--surface2);font-family:'DM Mono',monospace">${fmtMoney(li.rate, li.currency)}</td>
+          <td style="text-align:right;padding:10px 12px;border-bottom:1px solid var(--surface2);font-family:'DM Mono',monospace;font-weight:600">${fmtMoney(li.totalUSD)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    <div style="text-align:right;padding-top:8px;border-top:2px solid var(--label)">
+      <div style="font-size:13px;color:var(--label3);margin-bottom:4px">Margin (${margin}%): ${fmtMoney(sub*margin/100)}</div>
+      <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:600">Total: ${fmtMoney(total)}</div>
+    </div>
+    ${q.notes ? `<div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--label3)">${q.notes}</div>` : ''}
+  `;
+  openModal('view-quote-modal');
+}
+
+function editQuote(id) {
+  showPage('builder');
+  setTimeout(() => initBuilder(id), 50);
+}
+
+async function cloneQuoteById(id) {
+  const q = db.quotes.find(x => x.id === id);
+  if (!q) return;
+  const num = `QT-${new Date().getFullYear()}-${String(db.quoteCounter++).padStart(3,'0')}`;
+  const clone = {
+    ...q,
+    id: uid('q'),
+    number: num,
+    createdAt: new Date().toISOString().split('T')[0],
+    status: 'draft',
+    lineItems: q.lineItems.map(li => ({...li, id: uid('li')})),
+  };
+  db.quotes.push(clone);
+  await sbSaveQuote(clone);
+  renderHistory();
+  toast(`Cloned as ${num} ✓`, 'success');
+}
+
+function cloneQuote() {
+  if (viewingQuoteId) {
+    cloneQuoteById(viewingQuoteId);
+    closeModal('view-quote-modal');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// CONTACTS
+// ═══════════════════════════════════════════════════════
+
+let contactTab = 'carriers';
+
+function setContactTab(tab, btn) {
+  contactTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderContacts();
+}
+
+function filterContacts() { renderContacts(); }
+
+function renderContacts() {
+  const q = (document.getElementById('contacts-search')?.value || '').toLowerCase();
+  let contacts = db.contacts.filter(c =>
+    contactTab === 'carriers' ? c.type !== 'client' : c.type === 'client'
+  );
+  if (q) contacts = contacts.filter(c => [c.name, c.contact, c.email].join(' ').toLowerCase().includes(q));
+
+  const typeLabels = {
+    ocean_carrier: '🌊 Ocean',
+    air_carrier: '✈️ Air',
+    trucker: '🚛 Trucker',
+    broker: '📑 Broker',
+    client: '👤 Client',
+  };
+
+  document.getElementById('contacts-table-body').innerHTML = contacts.length
+    ? contacts.map(c => `<tr>
+        <td><span class="font-medium">${c.name}</span></td>
+        <td><span class="badge badge-gray">${typeLabels[c.type]||c.type}</span></td>
+        <td>${c.contact || '—'}</td>
+        <td><a href="mailto:${c.email}" style="color:var(--blue);text-decoration:none">${c.email||'—'}</a></td>
+        <td style="font-size:12.5px;color:var(--label3)">${c.phone||'—'}</td>
+        <td style="font-size:12.5px;color:var(--label3)">${c.notes||'—'}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="deleteContact('${c.id}')">🗑</button></td>
+      </tr>`)
+    .join('')
+    : '<tr><td colspan="7" style="text-align:center;color:var(--label3);padding:32px">No contacts found</td></tr>';
+}
+
+function openAddContact() {
+  ['ac-name','ac-contact','ac-email','ac-phone','ac-notes'].forEach(id => document.getElementById(id).value = '');
+  openModal('add-contact-modal');
+}
+
+async function saveContact() {
+  const name = document.getElementById('ac-name').value.trim();
+  if (!name) { toast('Name is required', 'error'); return; }
+  const c = {
+    id: 'c' + db.contactCounter++,
+    name,
+    type: document.getElementById('ac-type').value,
+    contact: document.getElementById('ac-contact').value.trim(),
+    email: document.getElementById('ac-email').value.trim(),
+    phone: document.getElementById('ac-phone').value.trim(),
+    notes: document.getElementById('ac-notes').value.trim(),
+    isProblem: false,
+  };
+  db.contacts.push(c);
+  await sbSaveContact(c);
+  closeModal('add-contact-modal');
+  renderContacts();
+  toast('Contact saved ✓', 'success');
+}
+
+async function deleteContact(id) {
+  if (!confirm('Delete this contact?')) return;
+  db.contacts = db.contacts.filter(c => c.id !== id);
+  await sbDeleteRecord('contacts', id);
+  renderContacts();
+  toast('Contact deleted');
+}
+
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+
+function renderSettings() {
+  const s = db.settings;
+  document.getElementById('cfg-margin-ocean').value = s.margins.ocean;
+  document.getElementById('cfg-margin-air').value = s.margins.air;
+  document.getElementById('cfg-margin-trucking').value = s.margins.trucking;
+  document.getElementById('cfg-margin-lcl-dest').value = s.margins.lclDest;
+  document.getElementById('cfg-margin-problem').value = s.margins.problemPremium;
+
+  // Show saved Supabase config
+  const savedUrl = localStorage.getItem('fleischer_sb_url') || '';
+  const savedKey = localStorage.getItem('fleischer_sb_key') || '';
+  document.getElementById('cfg-sb-url').value = savedUrl;
+  document.getElementById('cfg-sb-key').value = savedKey;
+  document.getElementById('supabase-connected-banner').style.display = USE_SUPABASE ? 'block' : 'none';
+  document.getElementById('supabase-status-label').textContent = USE_SUPABASE ? '🟢 Connected' : '🔴 Not connected — using local storage';
+
+  renderPassthroughTags();
+  renderTeamTags();
+}
+
+async function saveSupabaseConfig() {
+  const url = document.getElementById('cfg-sb-url').value.trim().replace(/\/$/, '');
+  const key = document.getElementById('cfg-sb-key').value.trim();
+  if (!url || !key) { toast('Both URL and key are required', 'error'); return; }
+
+  try {
+    const res = await fetch(`${url}/rest/v1/rates?limit=1`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Client-Info': 'fleischer/1.0'
+      }
+    });
+    console.log('Connection test status:', res.status);
+    const body = await res.text();
+    console.log('Connection test body:', body);
+
+    if (res.status === 401 || res.status === 403) {
+      toast(`Key rejected (${res.status}) — try the publishable key from the project overview`, 'error');
+      return;
+    }
+    // Any other status including 200, 204, 404, 406 = credentials work, proceed
+  } catch(e) {
+    toast(`Cannot reach Supabase: ${e.message}`, 'error');
+    return;
+  }
+
+  localStorage.setItem('fleischer_sb_url', url);
+  localStorage.setItem('fleischer_sb_key', key);
+  toast('Supabase connected! Reloading…', 'success');
+  setTimeout(() => location.reload(), 1500);
+}
+
+function renderPassthroughTags() {
+  document.getElementById('passthrough-tags').innerHTML = db.settings.passthroughs.map((p,i) => `
+    <span class="badge badge-orange" style="cursor:pointer;padding:5px 10px" title="Click to remove" onclick="removePassthrough(${i})">${p} ✕</span>
+  `).join('');
+}
+
+function renderTeamTags() {
+  document.getElementById('team-tags').innerHTML = db.settings.teamMembers.map((m,i) => `
+    <span class="badge badge-blue" style="cursor:pointer;padding:5px 10px" title="Click to remove" onclick="removeTeamMember(${i})">${m} ✕</span>
+  `).join('');
+}
+
+function addPassthrough() {
+  const val = document.getElementById('new-passthrough').value.trim();
+  if (!val) return;
+  db.settings.passthroughs.push(val);
+  document.getElementById('new-passthrough').value = '';
+  renderPassthroughTags();
+}
+
+function removePassthrough(i) {
+  db.settings.passthroughs.splice(i, 1);
+  renderPassthroughTags();
+}
+
+function addTeamMember() {
+  const val = document.getElementById('new-team-member').value.trim();
+  if (!val) return;
+  db.settings.teamMembers.push(val);
+  document.getElementById('new-team-member').value = '';
+  renderTeamTags();
+  // Update owner dropdowns
+  updateOwnerDropdowns();
+}
+
+function removeTeamMember(i) {
+  db.settings.teamMembers.splice(i, 1);
+  renderTeamTags();
+  updateOwnerDropdowns();
+}
+
+function updateOwnerDropdowns() {
+  const selects = document.querySelectorAll('#q-owner');
+  selects.forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = db.settings.teamMembers.map(m => `<option${m===cur?' selected':''}>${m}</option>`).join('');
+  });
+}
+
+async function saveSettings() {
+  db.settings.margins = {
+    ocean: parseFloat(document.getElementById('cfg-margin-ocean').value) || 0,
+    air: parseFloat(document.getElementById('cfg-margin-air').value) || 0,
+    trucking: parseFloat(document.getElementById('cfg-margin-trucking').value) || 0,
+    lclDest: parseFloat(document.getElementById('cfg-margin-lcl-dest').value) || 0,
+    problemPremium: parseFloat(document.getElementById('cfg-margin-problem').value) || 0,
+  };
+  await sbSaveSettings();
+  toast('Settings saved ✓', 'success');
+}
+
+// ═══════════════════════════════════════════════════════
+// MARGIN ENGINE — per line item logic
+// ═══════════════════════════════════════════════════════
+
+function getDefaultMarginForCategory(category, description, mode) {
+  const desc = (description||'').toLowerCase();
+  const s = db.settings;
+  // Check if it's a passthrough
+  const isPassthrough = s.passthroughs.some(p => desc.includes(p.toLowerCase()));
+  if (isPassthrough) return { pct: 0, isPassthrough: true };
+  if (category === 'surcharge') return { pct: 0, isPassthrough: true };
+  if (category === 'customs') return { pct: 0, isPassthrough: true };
+  if (category === 'freight') {
+    if (mode === 'air') return { pct: s.margins.air, isPassthrough: false };
+    if (mode === 'trucking') return { pct: s.margins.trucking, isPassthrough: false };
+    return { pct: s.margins.ocean, isPassthrough: false };
+  }
+  if (desc.includes('lcl') || desc.includes('destination')) return { pct: s.margins.lclDest, isPassthrough: false };
+  return { pct: 0, isPassthrough: false };
+}
+
+function isClientProblem(clientName) {
+  const c = db.contacts.find(x => x.type === 'client' && x.name.toLowerCase().includes((clientName||'').toLowerCase().slice(0,6)));
+  return c && c.isProblem;
+}
+
+// ═══════════════════════════════════════════════════════
+// AI INTELLIGENCE — warnings & pre-fills
+// ═══════════════════════════════════════════════════════
+
+async function getAIWarnings(origin, dest, mode, client, lineItems) {
+  const intelNotes = db.intel.map(i => `[${i.type}:${i.subject}] ${i.flag}: ${i.details}`).join('\n');
+  const charges = lineItems.map(li => li.description).join(', ');
+  const isProblem = isClientProblem(client);
+
+  const prompt = `You are a freight forwarding expert reviewing a quote before it's sent.
+
+CONTEXT:
+- Origin: ${origin}
+- Destination: ${dest}  
+- Mode: ${mode}
+- Client: ${client}${isProblem ? ' (FLAGGED: problem client)' : ''}
+- Charges included: ${charges || 'none yet'}
+
+INTELLIGENCE NOTES FROM OUR SYSTEM:
+${intelNotes || 'None saved yet'}
+
+Please review and return ONLY a JSON array of warnings/suggestions like this:
+[
+  { "type": "warning|missing|tip|margin", "message": "Short actionable message" }
+]
+
+Check for:
+1. Missing charges typical for this lane/origin country (ISF for US imports from China, OBL fees, chassis fees at Long Beach, etc.)
+2. Surcharges that are seasonally relevant or common for this trade lane
+3. Any intel notes that apply to this origin, destination, carrier, or client
+4. If client is flagged as problem, note that higher margin is recommended
+5. Common charges that get forgotten and billed later
+
+Return ONLY the JSON array, no other text.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content[0].text;
+    const match = text.match(/\[[\s\S]*\]/);
+    if (match) return JSON.parse(match[0]);
+  } catch(e) { console.error('AI warnings error:', e); }
+  return [];
+}
+
+function renderAIWarnings(warnings) {
+  const container = document.getElementById('ai-warnings-panel');
+  if (!container) return;
+  if (!warnings.length) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+  const typeStyle = {
+    warning: { bg: 'var(--red-light)', color: 'var(--red)', icon: '⚠' },
+    missing: { bg: 'var(--orange-light)', color: 'var(--orange)', icon: '🔴' },
+    tip: { bg: 'var(--blue-light)', color: 'var(--blue)', icon: '💡' },
+    margin: { bg: 'var(--green-light)', color: 'var(--green)', icon: '💰' },
+  };
+  container.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="ai-badge">✦ AI</span>
+        <span class="font-medium" style="font-size:13.5px">Quote Review</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ai-warnings-panel').style.display='none'">✕</button>
+    </div>
+    ${warnings.map(w => {
+      const st = typeStyle[w.type] || typeStyle.tip;
+      return `<div style="padding:9px 12px;background:${st.bg};border-radius:7px;margin-bottom:6px;font-size:13px;color:${st.color}">
+        <strong>${st.icon}</strong> ${w.message}
+      </div>`;
+    }).join('')}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// UPDATED QUOTE BUILDER — with margin per line + AI warnings
+// ═══════════════════════════════════════════════════════
+
+function addLineItem(category, description) {
+  const mode = document.getElementById('q-mode')?.value || 'ocean';
+  const marginInfo = getDefaultMarginForCategory(category, description, mode);
+  lineItems.push({
+    id: uid('li'),
+    category,
+    description: description || '',
+    qty: 1,
+    rate: 0,
+    currency: 'USD',
+    totalUSD: 0,
+    marginPct: marginInfo.pct,
+    isPassthrough: marginInfo.isPassthrough,
+  });
+  renderLineItems();
+}
+
+function renderLineItems() {
+  const catColors = { freight:'badge-blue', surcharge:'badge-orange', customs:'badge-red', other:'badge-gray' };
+  document.getElementById('line-items-body').innerHTML = lineItems.length
+    ? lineItems.map(li => `
+      <tr class="line-item-row">
+        <td><span class="badge ${catColors[li.category]||'badge-gray'} text-sm">${li.category}</span></td>
+        <td><input class="form-input" style="min-width:190px" value="${li.description}"
+          oninput="updateLI('${li.id}','description',this.value)"></td>
+        <td><input class="amount-input" style="width:55px;text-align:center" type="number" min="0" value="${li.qty}"
+          oninput="updateLI('${li.id}','qty',parseFloat(this.value)||1)"></td>
+        <td><input class="amount-input" type="number" min="0" value="${li.rate}"
+          oninput="updateLI('${li.id}','rate',parseFloat(this.value)||0)"></td>
+        <td>
+          <select class="currency-select" onchange="updateLI('${li.id}','currency',this.value)">
+            ${['USD','EUR','CNY','GBP','HKD','JPY','SGD','AUD'].map(c=>`<option${c===li.currency?' selected':''}>${c}</option>`).join('')}
+          </select>
+        </td>
+        <td>
+          ${li.isPassthrough
+            ? `<span class="badge badge-gray text-sm" title="Pass-through — no margin">Cost</span>`
+            : `<div style="display:flex;align-items:center;gap:4px">
+                <input class="amount-input" style="width:50px;text-align:center" type="number" min="0" max="100" value="${li.marginPct}"
+                  oninput="updateLI('${li.id}','marginPct',parseFloat(this.value)||0)" title="Margin %">
+                <span style="font-size:11px;color:var(--label3)">%</span>
+               </div>`
+          }
+        </td>
+        <td class="mono font-semibold" id="li-total-${li.id}">${fmtMoney(liTotal(li))}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="removeLineItem('${li.id}')">🗑</button></td>
+      </tr>
+    `).join('')
+    : `<tr><td colspan="8" style="text-align:center;color:var(--label3);padding:32px;font-size:13px">
+        No line items yet. Click the buttons above to add charges.
+      </td></tr>`;
+  recalcTotals();
+}
+
+function liTotal(li) {
+  const base = toUSD(li.qty * li.rate, li.currency);
+  const margin = li.isPassthrough ? 0 : (base * (li.marginPct||0) / 100);
+  return base + margin;
+}
+
+function updateLI(id, field, val) {
+  const li = lineItems.find(x => x.id === id);
+  if (!li) return;
+  li[field] = val;
+  // Auto-detect passthrough when description changes
+  if (field === 'description') {
+    const m = getDefaultMarginForCategory(li.category, val, document.getElementById('q-mode')?.value||'ocean');
+    li.isPassthrough = m.isPassthrough;
+    if (m.isPassthrough) li.marginPct = 0;
+    renderLineItems(); return;
+  }
+  li.totalUSD = liTotal(li);
+  const el = document.getElementById('li-total-'+id);
+  if (el) el.textContent = fmtMoney(liTotal(li));
+  recalcTotals();
+}
+
+function recalcTotals() {
+  const total = lineItems.reduce((s,li) => s + liTotal(li), 0);
+  const cost = lineItems.reduce((s,li) => s + toUSD(li.qty*li.rate, li.currency), 0);
+  const marginAmt = total - cost;
+  document.getElementById('q-subtotal').textContent = fmtMoney(cost);
+  document.getElementById('q-margin-amt').textContent = fmtMoney(marginAmt);
+  document.getElementById('q-total').textContent = fmtMoney(total);
+}
+
+// Override initBuilder to update owner dropdown and add AI panel
+const _origInitBuilder = initBuilder;
+function initBuilder(quoteId) {
+  currentQuoteId = quoteId || null;
+  const today = new Date().toISOString().split('T')[0];
+  const future = new Date(); future.setDate(future.getDate()+30);
+  const futureStr = future.toISOString().split('T')[0];
+
+  if (quoteId) {
+    const q = db.quotes.find(x => x.id === quoteId);
+    if (!q) return;
+    document.getElementById('q-client').value = q.client;
+    document.getElementById('q-origin').value = q.origin;
+    document.getElementById('q-dest').value = q.dest;
+    document.getElementById('q-mode').value = q.mode;
+    document.getElementById('q-incoterm').value = q.incoterm;
+    document.getElementById('q-valid-from').value = q.validFrom || today;
+    document.getElementById('q-valid-to').value = q.validTo || futureStr;
+    document.getElementById('q-notes').value = q.notes || '';
+    document.getElementById('q-owner').value = q.owner;
+    document.getElementById('q-margin').value = q.margin || 10;
+    lineItems = q.lineItems ? q.lineItems.map(li => ({...li})) : [];
+    document.getElementById('builder-title').textContent = 'Edit Quote';
+    document.getElementById('quote-number-display').textContent = q.number;
+  } else {
+    document.getElementById('q-client').value = '';
+    document.getElementById('q-origin').value = '';
+    document.getElementById('q-dest').value = '';
+    document.getElementById('q-mode').value = 'ocean';
+    document.getElementById('q-incoterm').value = 'FOB';
+    document.getElementById('q-valid-from').value = today;
+    document.getElementById('q-valid-to').value = futureStr;
+    document.getElementById('q-notes').value = '';
+    document.getElementById('q-margin').value = 10;
+    lineItems = [];
+    document.getElementById('builder-title').textContent = 'New Quote';
+    document.getElementById('quote-number-display').textContent = `QT-${new Date().getFullYear()}-${String(db.quoteCounter).padStart(3,'0')}`;
+  }
+  // Update owner dropdown from settings
+  const ownerSel = document.getElementById('q-owner');
+  const curOwner = quoteId ? (db.quotes.find(x=>x.id===quoteId)||{}).owner : ownerSel.value;
+  ownerSel.innerHTML = db.settings.teamMembers.map(m => `<option${m===curOwner?' selected':''}>${m}</option>`).join('');
+
+  document.getElementById('suggested-rates').innerHTML = '';
+  renderLineItems();
+}
+
+// Add AI review button to builder topbar
+document.addEventListener('DOMContentLoaded', () => {
+  // Inject AI warnings panel into builder
+  const builderContent = document.querySelector('#page-builder .content');
+  if (builderContent) {
+    const panel = document.createElement('div');
+    panel.id = 'ai-warnings-panel';
+    panel.style.cssText = 'display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px';
+    builderContent.insertBefore(panel, builderContent.firstChild);
+  }
+});
+
+async function runAIQuoteReview() {
+  const origin = document.getElementById('q-origin').value.trim();
+  const dest = document.getElementById('q-dest').value.trim();
+  const mode = document.getElementById('q-mode').value;
+  const client = document.getElementById('q-client').value.trim();
+  if (!origin && !dest) { toast('Add origin and destination first', 'error'); return; }
+  toast('Reviewing quote with AI…');
+  const warnings = await getAIWarnings(origin, dest, mode, client, lineItems);
+  renderAIWarnings(warnings);
+  if (!warnings.length) toast('No issues found ✓', 'success');
+}
+
+// ═══════════════════════════════════════════════════════
+// .MSG FILE PARSER (msgreader via CDN)
+// ═══════════════════════════════════════════════════════
+
+// We extract text from .msg files by reading the binary and pulling readable strings
+function extractTextFromMsg(arrayBuffer) {
+  // Simple extraction: pull readable ASCII/UTF-8 strings from binary .msg
+  const bytes = new Uint8Array(arrayBuffer);
+  let text = '';
+  let run = '';
+  for (let i = 0; i < bytes.length; i++) {
+    const b = bytes[i];
+    if ((b >= 32 && b < 127) || b === 9 || b === 10 || b === 13) {
+      run += String.fromCharCode(b);
+    } else {
+      if (run.length > 4) text += run + ' ';
+      run = '';
+    }
+  }
+  // Clean up and return meaningful lines
+  return text.split(/\s{3,}/).filter(s => s.trim().length > 10).join('\n').slice(0, 8000);
+}
+
+// ═══════════════════════════════════════════════════════
+// BULK IMPORT
+// ═══════════════════════════════════════════════════════
+
+let bulkQueue = [];
+let bulkResults = [];
+
+function handleBulkFiles(files) {
+  bulkQueue = Array.from(files);
+  document.getElementById('bulk-queue').style.display = 'block';
+  document.getElementById('bulk-queue-label').textContent = `${bulkQueue.length} file${bulkQueue.length===1?'':'s'} queued`;
+  document.getElementById('bulk-file-list').innerHTML = bulkQueue.map((f,i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:6px">
+      <span style="font-size:13px">📄 ${f.name}</span>
+      <span id="bulk-status-${i}" class="badge badge-gray">Queued</span>
+    </div>
+  `).join('');
+  document.getElementById('bulk-results').style.display = 'none';
+}
+
+async function processBulkQueue() {
+  if (!bulkQueue.length) return;
+  const btn = document.getElementById('bulk-process-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Parsing…';
+  bulkResults = [];
+
+  for (let i = 0; i < bulkQueue.length; i++) {
+    const file = bulkQueue[i];
+    const statusEl = document.getElementById(`bulk-status-${i}`);
+    statusEl.textContent = 'Parsing…';
+    statusEl.className = 'badge badge-orange';
+
+    try {
+      let emailText = '';
+      if (file.name.endsWith('.msg')) {
+        const buf = await file.arrayBuffer();
+        emailText = extractTextFromMsg(buf);
+      } else {
+        emailText = await file.text();
+      }
+
+      const result = await parseSingleEmail(emailText, file.name);
+      bulkResults.push({ file: file.name, data: result, status: 'ok' });
+      statusEl.textContent = '✓ Done';
+      statusEl.className = 'badge badge-green';
+    } catch(e) {
+      bulkResults.push({ file: file.name, data: null, status: 'error', error: e.message });
+      statusEl.textContent = '✗ Error';
+      statusEl.className = 'badge badge-red';
+    }
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✦ Parse All with AI';
+  renderBulkResults();
+}
+
+async function parseSingleEmail(text, filename) {
+  const carriers = db.contacts.map(c => c.name).join(', ');
+  const prompt = `You are a freight rate parser. Extract structured rate information from this carrier email/document.
+Known carriers: ${carriers}
+Return ONLY a JSON object:
+{
+  "mode": "ocean|air|trucking|brokerage",
+  "carrier": "carrier name",
+  "origin": "city, country/state",
+  "destination": "city, country/state",
+  "validFrom": "YYYY-MM-DD or null",
+  "validUntil": "YYYY-MM-DD or null",
+  "contactName": "name or null",
+  "contactEmail": "email or null",
+  "notes": "conditions/surcharges",
+  "lines": [{"description":"...","amount":0,"currency":"USD","unit":"20ft|40ft|40HC|per CBM|per KG|per shipment|per mile|per lane"}]
+}
+FILE: ${filename}
+CONTENT:
+${text.slice(0, 5000)}`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 800,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await response.json();
+  const raw = data.content[0].text;
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON returned');
+  return JSON.parse(match[0]);
+}
+
+function renderBulkResults() {
+  document.getElementById('bulk-results').style.display = 'block';
+  document.getElementById('bulk-results-body').innerHTML = bulkResults.map((r,i) => {
+    if (r.status === 'error') return `
+      <div style="padding:10px;background:var(--red-light);border-radius:6px;margin-bottom:8px;font-size:13px">
+        <strong style="color:var(--red)">✗ ${r.file}</strong> — Parse failed: ${r.error}
+      </div>`;
+    const d = r.data;
+    const lines = (d.lines||[]).map(l => `${l.description}: ${fmtMoney(l.amount,l.currency)}/${l.unit}`).join(', ');
+    return `<div style="padding:12px;background:var(--bg);border-radius:8px;margin-bottom:8px;font-size:13px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span class="font-medium">✓ ${r.file}</span>
+        <span class="badge ${modeBadgeClass(d.mode)}">${modeIcon(d.mode)} ${d.mode}</span>
+      </div>
+      <div style="color:var(--label3)">${d.carrier} · ${d.origin} → ${d.destination}</div>
+      ${d.validUntil ? `<div style="color:var(--label3)">Valid until: ${fmtDate(d.validUntil)}</div>` : ''}
+      <div style="margin-top:4px">${lines}</div>
+    </div>`;
+  }).join('');
+}
+
+async function saveBulkResults() {
+  let count = 0;
+  for (const r of bulkResults.filter(r => r.status === 'ok' && r.data)) {
+    const d = r.data;
+    for (const l of (d.lines||[{description:'Rate', amount:0, currency:'USD', unit:'per shipment'}])) {
+      const rate = {
+        id: 'r' + db.rateCounter++,
+        mode: d.mode || 'ocean',
+        carrier: d.carrier || 'Unknown',
+        origin: d.origin || '',
+        dest: d.destination || '',
+        rate: l.amount,
+        currency: l.currency || 'USD',
+        unit: l.unit,
+        validUntil: d.validUntil || '',
+        notes: l.description + (d.notes ? ' | ' + d.notes : ''),
+        createdAt: new Date().toISOString().split('T')[0],
+      };
+      db.rates.push(rate);
+      await sbSaveRate(rate);
+      count++;
+    }
+    if (d.carrier && d.contactEmail) {
+      const exists = db.contacts.find(c => c.name.toLowerCase().includes(d.carrier.toLowerCase().slice(0,5)));
+      if (!exists) {
+        const c = {
+          id: 'c' + db.contactCounter++,
+          name: d.carrier,
+          type: d.mode === 'trucking' ? 'trucker' : d.mode === 'air' ? 'air_carrier' : d.mode === 'brokerage' ? 'broker' : 'ocean_carrier',
+          contact: d.contactName || '',
+          email: d.contactEmail,
+          phone: '',
+          notes: 'Added via bulk import',
+          isProblem: false,
+        };
+        db.contacts.push(c);
+        await sbSaveContact(c);
+      }
+    }
+  }
+  bulkQueue = [];
+  bulkResults = [];
+  document.getElementById('bulk-queue').style.display = 'none';
+  document.getElementById('bulk-results').style.display = 'none';
+  toast(`${count} rate(s) imported to library ✓`, 'success');
+  showPage('rates');
+}
+
+// ═══════════════════════════════════════════════════════
+// AI TRAINING — intel notes & quote training
+// ═══════════════════════════════════════════════════════
+
+function renderTraining() {
+  renderIntelNotes();
+  // Setup bulk drop zone
+  const dz = document.getElementById('bulk-drop-zone');
+  if (dz && !dz._bound) {
+    dz._bound = true;
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      handleBulkFiles(e.dataTransfer.files);
+    });
+  }
+}
+
+function renderIntelNotes() {
+  const flagIcons = { warning:'⚠', always_include:'✅', often_missed:'🔴', higher_margin:'💰', zip_coverage:'📍', note:'📝' };
+  const flagColors = { warning:'badge-red', always_include:'badge-green', often_missed:'badge-red', higher_margin:'badge-orange', zip_coverage:'badge-blue', note:'badge-gray' };
+  const container = document.getElementById('intel-notes-list');
+  if (!container) return;
+  container.innerHTML = db.intel.length
+    ? db.intel.map(i => `
+        <div style="padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+              <span class="badge badge-gray text-sm">${i.type}</span>
+              <span class="font-medium" style="font-size:13.5px">${i.subject}</span>
+              <span class="badge ${flagColors[i.flag]||'badge-gray'} text-sm">${flagIcons[i.flag]||''} ${i.flag.replace(/_/g,' ')}</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="deleteIntel('${i.id}')">🗑</button>
+          </div>
+          <div style="font-size:13px;color:var(--label3)">${i.details}</div>
+        </div>
+      `).join('')
+    : '<div style="color:var(--label3);font-size:13px;padding:16px 0">No intelligence notes yet. Add notes above to train the AI.</div>';
+}
+
+async function saveIntel() {
+  const subject = document.getElementById('intel-subject').value.trim();
+  const details = document.getElementById('intel-details').value.trim();
+  if (!subject || !details) { toast('Please fill in subject and details', 'error'); return; }
+  const i = {
+    id: 'i' + db.intelCounter++,
+    type: document.getElementById('intel-type').value,
+    subject,
+    flag: document.getElementById('intel-flag').value,
+    details,
+    createdAt: new Date().toISOString().split('T')[0],
+  };
+  db.intel.push(i);
+  await sbSaveIntel(i);
+  document.getElementById('intel-subject').value = '';
+  document.getElementById('intel-details').value = '';
+  renderIntelNotes();
+  toast('Intelligence note saved ✓', 'success');
+}
+
+async function deleteIntel(id) {
+  db.intel = db.intel.filter(i => i.id !== id);
+  await sbDeleteRecord('intel', id);
+  renderIntelNotes();
+}
+
+async function trainOnQuote() {
+  const client = document.getElementById('train-client').value.trim();
+  const lane = document.getElementById('train-lane').value.trim();
+  const text = document.getElementById('train-quote-text').value.trim();
+  if (!text) { toast('Please paste quote content first', 'error'); return; }
+
+  const btn = document.querySelector('[onclick="trainOnQuote()"]');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Learning…';
+
+  try {
+    const prompt = `You are a freight forwarding expert. Analyze this past quote and extract intelligence that should be saved to help future quoting.
+
+Client: ${client || 'unknown'}
+Lane: ${lane || 'unknown'}
+
+QUOTE/NOTES:
+${text}
+
+Return ONLY a JSON array of intelligence notes to save:
+[
+  {
+    "type": "lane|port|carrier|trucker|client|country",
+    "subject": "specific subject name",
+    "flag": "warning|always_include|often_missed|higher_margin|zip_coverage|note",
+    "details": "specific actionable note"
+  }
+]
+
+Focus on: margin patterns, charges that were included/missing, client payment behavior, lane-specific fees, what to watch out for. Return only genuinely useful notes.`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const raw = data.content[0].text;
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (match) {
+      const notes = JSON.parse(match[0]);
+      notes.forEach(n => {
+        db.intel.push({ id: 'i' + db.intelCounter++, ...n, createdAt: new Date().toISOString().split('T')[0] });
+      });
+      saveDB();
+      document.getElementById('train-client').value = '';
+      document.getElementById('train-lane').value = '';
+      document.getElementById('train-quote-text').value = '';
+      renderIntelNotes();
+      toast(`${notes.length} intelligence note(s) extracted ✓`, 'success');
+    }
+  } catch(e) {
+    toast('Failed to analyze quote', 'error');
+  }
+  btn.disabled = false; btn.innerHTML = '✦ Learn from This Quote';
+}
+
+// ═══════════════════════════════════════════════════════
+// CONTACTS — add isProblem flag and zip coverage
+// ═══════════════════════════════════════════════════════
+
+function renderContacts() {
+  const q = (document.getElementById('contacts-search')?.value || '').toLowerCase();
+  let contacts = db.contacts.filter(c =>
+    contactTab === 'carriers' ? c.type !== 'client' : c.type === 'client'
+  );
+  if (q) contacts = contacts.filter(c => [c.name, c.contact, c.email].join(' ').toLowerCase().includes(q));
+
+  const typeLabels = {
+    ocean_carrier: '🌊 Ocean', air_carrier: '✈️ Air', trucker: '🚛 Trucker',
+    broker: '📑 Broker', client: '👤 Client',
+  };
+
+  document.getElementById('contacts-table-body').innerHTML = contacts.length
+    ? contacts.map(c => `<tr>
+        <td>
+          <span class="font-medium">${c.name}</span>
+          ${c.isProblem ? `<span class="badge badge-red text-sm" style="margin-left:6px">⚠ Problem</span>` : ''}
+        </td>
+        <td><span class="badge badge-gray">${typeLabels[c.type]||c.type}</span></td>
+        <td>${c.contact || '—'}</td>
+        <td><a href="mailto:${c.email}" style="color:var(--blue);text-decoration:none">${c.email||'—'}</a></td>
+        <td style="font-size:12.5px;color:var(--label3)">${c.phone||'—'}</td>
+        <td style="font-size:12.5px;color:var(--label3)">
+          ${c.zipCoverage ? `📍 ${c.zipCoverage}` : c.notes||'—'}
+        </td>
+        <td style="white-space:nowrap">
+          ${c.type === 'client' ? `<button class="btn btn-ghost btn-sm" onclick="toggleProblemClient('${c.id}')" title="${c.isProblem?'Remove problem flag':'Flag as problem client'}">${c.isProblem?'✅':'⚠'}</button>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="deleteContact('${c.id}')">🗑</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="7" style="text-align:center;color:var(--label3);padding:32px">No contacts found</td></tr>';
+}
+
+async function toggleProblemClient(id) {
+  const c = db.contacts.find(x => x.id === id);
+  if (!c) return;
+  c.isProblem = !c.isProblem;
+  await sbSaveContact(c);
+  renderContacts();
+  toast(c.isProblem ? '⚠ Flagged as problem client' : '✅ Problem flag removed');
+}
+
+
+
+
+// ═══════════════════════════════════════════════════════
+// PARSE PAGE — DOC TYPE FLOW
+// ═══════════════════════════════════════════════════════
+
+let selectedDocType = null;
+
+function selectDocType(type, el) {
+  document.querySelectorAll('.doc-type-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedDocType = type;
+  document.getElementById('parse-next-btn').style.display = 'inline-flex';
+}
+
+function goToParseStep2() {
+  if (!selectedDocType) return;
+  document.getElementById('parse-step1').style.display = 'none';
+  document.getElementById('parse-step2').style.display = 'block';
+
+  const labels = {
+    rfq: '📥 Client Quote Request',
+    carrier_rate: '🌊 Carrier Rate',
+    trucker_quote: '🚛 Trucker Quote',
+    origin_agent: '📦 Origin Agent Quote',
+    dest_agent: '🏁 Destination Agent Quote',
+    general: '📄 General',
+  };
+  document.getElementById('parse-doc-type-label').textContent = labels[selectedDocType] || selectedDocType;
+
+  // Update save button label
+  const saveBtn = document.getElementById('parse-save-btn');
+  if (selectedDocType === 'rfq') saveBtn.textContent = '🏗️ Build Quote from RFQ';
+  else if (selectedDocType === 'dest_agent') saveBtn.textContent = '🏗️ Build Quote for Agent';
+  else saveBtn.textContent = '💾 Save to Library';
+
+  // Show dest agent notice
+  document.getElementById('parse-dest-agent-notice').style.display =
+    selectedDocType === 'dest_agent' ? 'block' : 'none';
+}
+
+function backToParseStep1() {
+  document.getElementById('parse-step1').style.display = 'block';
+  document.getElementById('parse-step2').style.display = 'none';
+  clearParse();
+}
+
+// Override parseEmail to use doc type in prompt
+async function parseEmail() {
+  const text = document.getElementById('email-paste-area').value.trim();
+  if (!text) { toast('Please paste document content first', 'error'); return; }
+
+  document.getElementById('parse-results').style.display = 'none';
+  document.getElementById('parse-loading').style.display = 'block';
+  const btn = document.getElementById('parse-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Parsing…';
+
+  const docTypePrompts = {
+    rfq: 'This is a CLIENT QUOTE REQUEST (RFQ). Extract what the client is asking for: origin, destination, mode, cargo details, incoterm, timeline, special requirements.',
+    carrier_rate: 'This is a CARRIER RATE CONFIRMATION. Extract the rate details to save to our rate library.',
+    trucker_quote: 'This is a TRUCKER/DRAYAGE QUOTE — this is our cost. Extract pickup/delivery points, rate, validity.',
+    origin_agent: 'This is an ORIGIN AGENT QUOTE — this is our cost from origin. Extract all origin charges.',
+    dest_agent: 'This is a DESTINATION AGENT requesting a quote from us — they are our client. Extract what they need quoted.',
+    general: 'Extract whatever rate, quote, or cost information is present.',
+  };
+
+  try {
+    const carriers = db.contacts.map(c => c.name).join(', ');
+    const typeInstructions = docTypePrompts[selectedDocType] || docTypePrompts.general;
+
+    const prompt = `You are a freight forwarding expert parsing a document.
+
+DOCUMENT TYPE: ${selectedDocType}
+INSTRUCTION: ${typeInstructions}
+
+Known contacts in our system: ${carriers}
+
+Return ONLY a JSON object:
+{
+  "documentType": "${selectedDocType}",
+  "mode": "ocean|air|trucking|brokerage|mixed",
+  "carrier": "carrier/agent/trucker name if applicable",
+  "client": "client name if this is an RFQ or dest agent request",
+  "origin": "origin location",
+  "destination": "destination location",
+  "incoterm": "incoterm if mentioned",
+  "cargoDetails": "cargo description, weight, CBM, container type if mentioned",
+  "cbm": null or number,
+  "containerType": "20ft|40ft|40HC|LCL or null",
+  "contactName": "contact person",
+  "contactEmail": "email",
+  "validFrom": "YYYY-MM-DD or null",
+  "validUntil": "YYYY-MM-DD or null",
+  "notes": "special conditions, requirements",
+  "lines": [
+    { "description": "charge description", "amount": 0, "currency": "USD", "unit": "per shipment" }
+  ]
+}
+
+DOCUMENT:
+${text.slice(0, 6000)}`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content[0].text;
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON found');
+    parsedData = JSON.parse(jsonMatch[0]);
+    renderParsedData(parsedData);
+
+  } catch(e) {
+    console.error(e);
+    toast('Failed to parse document. Check console.', 'error');
+    document.getElementById('parse-loading').style.display = 'none';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✦ Parse with AI';
+}
+
+// Override saveToRateLibrary for RFQ/dest_agent flows
+async function saveToRateLibrary() {
+  if (!parsedData) return;
+
+  // RFQ or dest agent → open quote builder pre-filled
+  if (selectedDocType === 'rfq' || selectedDocType === 'dest_agent') {
+    closeModal('add-rate-modal');
+    showPage('builder');
+    setTimeout(() => {
+      if (parsedData.client) document.getElementById('q-client').value = parsedData.client;
+      if (parsedData.origin) document.getElementById('q-origin').value = parsedData.origin;
+      if (parsedData.destination) document.getElementById('q-dest').value = parsedData.destination;
+      if (parsedData.incoterm) document.getElementById('q-incoterm').value = parsedData.incoterm;
+      if (parsedData.mode && parsedData.mode !== 'mixed') document.getElementById('q-mode').value = parsedData.mode;
+      document.getElementById('q-notes').value = parsedData.cargoDetails || parsedData.notes || '';
+      toast(`Quote Builder pre-filled from ${selectedDocType === 'rfq' ? 'client RFQ' : 'agent request'} ✓`, 'success');
+      clearParse();
+    }, 100);
+    return;
+  }
+
+  // Otherwise save to rate library
+  const lines = parsedData.lines || [];
+  if (!lines.length) lines.push({ description: 'Rate', amount: 0, currency: 'USD', unit: 'per shipment' });
+
+  for (const l of lines) {
+    const r = {
+      id: 'r' + db.rateCounter++,
+      mode: parsedData.mode || 'ocean',
+      carrier: parsedData.carrier || 'Unknown',
+      origin: parsedData.origin || '',
+      dest: parsedData.destination || '',
+      rate: l.amount,
+      currency: l.currency || 'USD',
+      unit: l.unit,
+      validUntil: parsedData.validUntil || '',
+      notes: l.description + (parsedData.notes ? ' | ' + parsedData.notes : ''),
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+    db.rates.push(r);
+    await sbSaveRate(r);
+  }
+
+  if (parsedData.carrier && parsedData.contactEmail) {
+    const existing = db.contacts.find(c => c.name.toLowerCase().includes((parsedData.carrier||'').toLowerCase().slice(0,6)));
+    if (!existing) {
+      const c = {
+        id: 'c' + db.contactCounter++,
+        name: parsedData.carrier,
+        type: parsedData.mode === 'trucking' ? 'trucker' : parsedData.mode === 'air' ? 'air_carrier' : parsedData.mode === 'brokerage' ? 'broker' : 'ocean_carrier',
+        contact: parsedData.contactName || '',
+        email: parsedData.contactEmail || '',
+        phone: '',
+        notes: `Added via ${selectedDocType} parse`,
+        isProblem: false,
+      };
+      db.contacts.push(c);
+      await sbSaveContact(c);
+    }
+  }
+
+  clearParse();
+  toast(`${lines.length} rate(s) saved to library ✓`, 'success');
+  showPage('rates');
+}
+
+function clearParse() {
+  parsedData = null;
+  const ta = document.getElementById('email-paste-area');
+  if (ta) ta.value = '';
+  const pr = document.getElementById('parse-results');
+  if (pr) pr.style.display = 'none';
+  const pl = document.getElementById('parse-loading');
+  if (pl) pl.style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════
+// FCL MARKUP PROMPT
+// ═══════════════════════════════════════════════════════
+
+let fclPendingLineId = null;
+let fclSelectedMarkup = null;
+
+function showFCLMarkupPrompt(lineId) {
+  fclPendingLineId = lineId;
+  fclSelectedMarkup = null;
+  document.querySelectorAll('#fcl-options .prompt-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('fcl-custom-input').style.display = 'none';
+  document.getElementById('fcl-custom-value').value = '';
+  openModal('fcl-markup-modal');
+}
+
+function selectFCLMarkup(val, el) {
+  document.querySelectorAll('#fcl-options .prompt-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  fclSelectedMarkup = val;
+  if (val === 'other') {
+    document.getElementById('fcl-custom-input').style.display = 'block';
+    document.getElementById('fcl-custom-value').focus();
+  } else {
+    document.getElementById('fcl-custom-input').style.display = 'none';
+  }
+}
+
+function applyFCLMarkup() {
+  let markup = fclSelectedMarkup;
+  if (markup === 'other') {
+    markup = parseFloat(document.getElementById('fcl-custom-value').value) || 0;
+  }
+  if (!markup || markup === 'other') { closeModal('fcl-markup-modal'); return; }
+
+  if (fclPendingLineId) {
+    const li = lineItems.find(x => x.id === fclPendingLineId);
+    if (li) {
+      // Add markup as separate surcharge line
+      lineItems.push({
+        id: uid('li'),
+        category: 'surcharge',
+        description: `Ocean Freight Markup`,
+        qty: 1,
+        rate: markup,
+        currency: 'USD',
+        totalUSD: markup,
+        marginPct: 0,
+        isPassthrough: false,
+      });
+      renderLineItems();
+      toast(`$${markup} markup added ✓`, 'success');
+    }
+  }
+  closeModal('fcl-markup-modal');
+  // After FCL prompt, show delivery prompt
+  setTimeout(() => showDeliveryPrompt(), 300);
+}
+
+function closeFCLModal() {
+  closeModal('fcl-markup-modal');
+  setTimeout(() => showDeliveryPrompt(), 300);
+}
+
+// ═══════════════════════════════════════════════════════
+// DELIVERY / DRAYAGE PROMPT
+// ═══════════════════════════════════════════════════════
+
+let deliveryChoice = null;
+
+function showDeliveryPrompt() {
+  const incoterm = document.getElementById('q-incoterm')?.value || '';
+  const incotermsSuggestingDelivery = ['EXW', 'FCA', 'FOB', 'CFR', 'CIF'];
+  const suggested = incotermsSuggestingDelivery.includes(incoterm);
+  document.getElementById('delivery-prompt-sub').textContent =
+    `Incoterm is ${incoterm || 'not set'}. ${suggested ? 'Delivery is typically needed — do you want to include it?' : 'Do you want to add delivery/drayage to this quote?'}`;
+
+  deliveryChoice = null;
+  document.querySelectorAll('#delivery-yes, #delivery-no').forEach(o => o.classList.remove('selected'));
+  // Pre-select based on incoterm
+  if (suggested) {
+    document.getElementById('delivery-yes').classList.add('selected');
+    deliveryChoice = true;
+  }
+  openModal('delivery-prompt-modal');
+}
+
+function selectDelivery(val, el) {
+  document.querySelectorAll('#delivery-yes, #delivery-no').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  deliveryChoice = val;
+}
+
+function applyDeliveryChoice() {
+  closeModal('delivery-prompt-modal');
+  if (deliveryChoice === true) {
+    // Add a trucking line item
+    lineItems.push({
+      id: uid('li'),
+      category: 'freight',
+      description: 'Delivery / Drayage',
+      qty: 1,
+      rate: 0,
+      currency: 'USD',
+      totalUSD: 0,
+      marginPct: db.settings.margins.trucking || 10,
+      isPassthrough: false,
+    });
+    renderLineItems();
+    toast('Delivery line added — enter the rate ✓', 'success');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// LCL MINIMUM PROFIT CHECK
+// ═══════════════════════════════════════════════════════
+
+function checkLCLMargin(li) {
+  const mode = document.getElementById('q-mode')?.value;
+  if (mode !== 'ocean') return;
+  if (li.category !== 'freight') return;
+
+  const desc = li.description.toLowerCase();
+  const cbmMatch = desc.match(/(\d+\.?\d*)\s*cbm/);
+  if (!cbmMatch) return;
+
+  const cbm = parseFloat(cbmMatch[1]);
+  const cost = toUSD(li.qty * li.rate, li.currency);
+  const currentProfit = liTotal(li) - cost;
+
+  if (cbm < 4) {
+    // Minimum $110 profit
+    if (currentProfit < 110) {
+      const requiredMarkup = 110 - currentProfit;
+      const newRate = li.rate + (requiredMarkup / li.qty);
+      li.rate = Math.round(newRate * 100) / 100;
+      li.totalUSD = liTotal(li);
+      toast(`LCL under 4 CBM: rate adjusted to ensure $110 min profit ✓`, 'success');
+      renderLineItems();
+    }
+  } else {
+    // Over 4 CBM: add $35 if not already making $110
+    if (currentProfit < 110) {
+      lineItems.push({
+        id: uid('li'),
+        category: 'surcharge',
+        description: 'LCL Freight Markup (>4 CBM)',
+        qty: 1,
+        rate: 35,
+        currency: 'USD',
+        totalUSD: 35,
+        marginPct: 0,
+        isPassthrough: false,
+      });
+      toast(`LCL over 4 CBM: $35 markup added ✓`, 'success');
+      renderLineItems();
+    }
+  }
+}
+
+// Hook LCL check into updateLI
+const _origUpdateLI = updateLI;
+function updateLI(id, field, val) {
+  const li = lineItems.find(x => x.id === id);
+  if (!li) return;
+  li[field] = val;
+  if (field === 'description') {
+    const m = getDefaultMarginForCategory(li.category, val, document.getElementById('q-mode')?.value||'ocean');
+    li.isPassthrough = m.isPassthrough;
+    if (m.isPassthrough) li.marginPct = 0;
+    renderLineItems();
+    return;
+  }
+  li.totalUSD = liTotal(li);
+  const el = document.getElementById('li-total-'+id);
+  if (el) el.textContent = fmtMoney(liTotal(li));
+  recalcTotals();
+  // Check LCL on rate/qty changes
+  if (field === 'rate' || field === 'qty') checkLCLMargin(li);
+}
+
+// Hook FCL prompt into addRateAsLineItem
+const _origAddRateAsLineItem = addRateAsLineItem;
+function addRateAsLineItem(rateId) {
+  const r = db.rates.find(x => x.id === rateId);
+  if (!r) return;
+  const isFCL = r.mode === 'ocean' && ['20ft','40ft','40HC'].some(u => r.unit.includes(u));
+  const li = {
+    id: uid('li'),
+    category: 'freight',
+    description: `${r.carrier} — ${r.origin} → ${r.dest} (${r.unit})`,
+    qty: 1,
+    rate: r.rate,
+    currency: r.currency,
+    totalUSD: toUSD(r.rate, r.currency),
+    marginPct: 0,
+    isPassthrough: false,
+  };
+  lineItems.push(li);
+  renderLineItems();
+  toast(`Added ${r.carrier} rate ✓`, 'success');
+
+  if (isFCL) {
+    setTimeout(() => showFCLMarkupPrompt(li.id), 300);
+  } else {
+    setTimeout(() => showDeliveryPrompt(), 300);
+  }
+}
+
+// Also hook manual "Add Freight" button for FCL check
+const _origAddLineItem = addLineItem;
+function addLineItem(category, description) {
+  const mode = document.getElementById('q-mode')?.value || 'ocean';
+  const marginInfo = getDefaultMarginForCategory(category, description, mode);
+  const li = {
+    id: uid('li'),
+    category,
+    description: description || '',
+    qty: 1,
+    rate: 0,
+    currency: 'USD',
+    totalUSD: 0,
+    marginPct: marginInfo.pct,
+    isPassthrough: marginInfo.isPassthrough,
+  };
+  lineItems.push(li);
+  renderLineItems();
+
+  const isFCL = category === 'freight' && mode === 'ocean' && description && description.toLowerCase().includes('freight');
+  if (isFCL && mode === 'ocean') {
+    setTimeout(() => showFCLMarkupPrompt(li.id), 300);
+  }
+}
+
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (USE_SUPABASE) {
+    await loadFromSupabase();
+  }
+  renderDashboard();
+  // Drag & drop for single email parse
+  const dz = document.getElementById('drop-zone');
+  if (dz) {
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        if (file.name.endsWith('.msg')) {
+          file.arrayBuffer().then(buf => {
+            document.getElementById('email-paste-area').value = extractTextFromMsg(buf);
+          });
+        } else {
+          const reader = new FileReader();
+          reader.onload = ev => { document.getElementById('email-paste-area').value = ev.target.result; };
+          reader.readAsText(file);
+        }
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>
