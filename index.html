@@ -1761,10 +1761,20 @@ function saveDB() {
 
 // ── Supabase load — called on app init if configured ───
 async function loadFromSupabase() {
+  // Safety timeout — never freeze longer than 8 seconds
+  const timeout = setTimeout(() => {
+    hideLoadingOverlay();
+    toast('Database connection timed out — check your credentials in Settings', 'error');
+  }, 8000);
+
   try {
-    showLoadingOverlay('Connecting to database…');
-    
-    // Test connection first with detailed logging
+    // Show subtle loading indicator but don't block navigation
+    const statusEl = document.createElement('div');
+    statusEl.id = 'sb-loading-bar';
+    statusEl.style.cssText = 'position:fixed;top:0;left:0;right:0;height:3px;background:var(--blue);z-index:9999;animation:sbpulse 1s ease-in-out infinite';
+    document.head.insertAdjacentHTML('beforeend', '<style>@keyframes sbpulse{0%,100%{opacity:0.4}50%{opacity:1}}</style>');
+    document.body.appendChild(statusEl);
+
     const testRes = await fetch(`${SUPABASE_URL}/rest/v1/rates?limit=1`, {
       headers: { 
         apikey: SUPABASE_KEY, 
@@ -1774,12 +1784,8 @@ async function loadFromSupabase() {
       }
     });
     
-    console.log('Supabase test status:', testRes.status);
-    const testText = await testRes.text();
-    console.log('Supabase test response:', testText);
-    
     if (!testRes.ok && testRes.status !== 406) {
-      throw new Error(`HTTP ${testRes.status}: ${testText}`);
+      throw new Error(`HTTP ${testRes.status}`);
     }
 
     const [rates, quotes, contacts, intel, settingsRows] = await Promise.all([
@@ -1802,10 +1808,14 @@ async function loadFromSupabase() {
       const s = settingsRows[0];
       db.settings = typeof s.data === 'string' ? JSON.parse(s.data) : s.data;
     }
-    hideLoadingOverlay();
-    toast('Connected to Fleischer database ✓', 'success');
+
+    clearTimeout(timeout);
+    statusEl.remove();
+    renderDashboard();
+    toast('✓ Database connected', 'success');
   } catch(e) {
-    hideLoadingOverlay();
+    clearTimeout(timeout);
+    document.getElementById('sb-loading-bar')?.remove();
     console.error('Supabase load error:', e);
     toast(`DB error: ${e.message}`, 'error');
   }
@@ -4278,6 +4288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 </script>
 </body>
 </html>
+
 
 
 
