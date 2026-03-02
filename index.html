@@ -1636,8 +1636,9 @@ window.parseMsgFile = function(arrayBuffer) {
 // ═══════════════════════════════════════════════════════
 
 function getApiEndpoint() {
-  const proxy = localStorage.getItem('fleischer_proxy') || 'https://purple-shape-2d83.rich-0b3.workers.dev/';
-  return proxy;
+  // Always route through Cloudflare worker proxy — never call Anthropic directly
+  // (direct calls are blocked by CORS on hosted pages)
+  return localStorage.getItem('fleischer_proxy') || 'https://purple-shape-2d83.rich-0b3.workers.dev/';
 }
 
 function getApiHeaders() {
@@ -4227,4 +4228,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 </script>
 </body>
 </html>
+
 
