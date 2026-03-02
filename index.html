@@ -704,6 +704,9 @@ function showPage(id) {
 }
 </script>
 
+  <!-- ─── APP WRAPPER ──────────────────────────────────── -->
+  <div class="app">
+
   <!-- ─── SIDEBAR ─────────────────────────────────────── -->
   <aside class="sidebar">
     <div class="sidebar-logo">
@@ -1067,10 +1070,14 @@ function showPage(id) {
           <div class="card">
             <div class="card-header">
               <span class="card-title">Line Items</span>
-              <div class="flex gap-2">
+              <div class="flex gap-2" style="flex-wrap:wrap">
                 <button class="btn btn-ghost btn-sm" onclick="addLineItem('freight','Ocean Freight')">+ Freight</button>
                 <button class="btn btn-ghost btn-sm" onclick="addLineItem('surcharge','')">+ Surcharge</button>
                 <button class="btn btn-ghost btn-sm" onclick="addLineItem('customs','Customs Brokerage')">+ Customs</button>
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem('surcharge','Chassis',1,0,'USD','FCL')">+ Chassis</button>
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem('surcharge','Chassis Split',1,0,'USD','FCL')">+ Chassis Split</button>
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem('surcharge','Yard Storage',1,0,'USD','FCL')">+ Yard Storage</button>
+                <button class="btn btn-ghost btn-sm" onclick="addLineItem('surcharge','Waiting Time',1,0,'USD','per hour')">+ Waiting Time</button>
                 <button class="btn btn-ghost btn-sm" onclick="addLineItem('other','')">+ Other</button>
               </div>
             </div>
@@ -3187,16 +3194,17 @@ function renderAIWarnings(warnings) {
 // UPDATED QUOTE BUILDER — with margin per line + AI warnings
 // ═══════════════════════════════════════════════════════
 
-function addLineItem(category, description) {
+function addLineItem(category, description, qty, rate, currency, unit) {
   const mode = document.getElementById('q-mode')?.value || 'ocean';
   const marginInfo = getDefaultMarginForCategory(category, description, mode);
   lineItems.push({
     id: uid('li'),
     category,
     description: description || '',
-    qty: 1,
-    rate: 0,
-    currency: 'USD',
+    qty: qty || 1,
+    rate: rate || 0,
+    currency: currency || 'USD',
+    unit: unit || '',
     totalUSD: 0,
     marginPct: marginInfo.pct,
     isPassthrough: marginInfo.isPassthrough,
@@ -3214,8 +3222,13 @@ function renderLineItems() {
           oninput="updateLI('${li.id}','description',this.value)"></td>
         <td><input class="amount-input" style="width:55px;text-align:center" type="number" min="0" value="${li.qty}"
           oninput="updateLI('${li.id}','qty',parseFloat(this.value)||1)"></td>
-        <td><input class="amount-input" type="number" min="0" value="${li.rate}"
-          oninput="updateLI('${li.id}','rate',parseFloat(this.value)||0)"></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="amount-input" type="number" min="0" value="${li.rate}"
+              oninput="updateLI('${li.id}','rate',parseFloat(this.value)||0)">
+            ${li.unit ? `<span style="font-size:11px;color:var(--label3);white-space:nowrap">${li.unit}</span>` : ''}
+          </div>
+        </td>
         <td>
           <select class="currency-select" onchange="updateLI('${li.id}','currency',this.value)">
             ${['USD','EUR','CNY','GBP','HKD','JPY','SGD','AUD'].map(c=>`<option${c===li.currency?' selected':''}>${c}</option>`).join('')}
@@ -4298,5 +4311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 </script>
+</div><!-- /.app -->
 </body>
 </html>
+
