@@ -1258,9 +1258,21 @@ window.parseMsgFile = function(arrayBuffer) {
               <button class="btn btn-green" onclick="saveSupabaseConfig()" style="width:fit-content">🔌 Connect & Save</button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+
+          <!-- Credentials Backup / Restore -->
+          <div style="margin-top:16px;padding:24px;background:var(--label);border-radius:12px;color:var(--bg)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+              <span style="font-size:20px">🔑</span>
+              <span style="font-size:18px;font-weight:600">Backup & Restore Credentials</span>
+            </div>
+            <div style="font-size:13px;opacity:0.6;margin-bottom:20px">Export your keys to a file so you never have to re-enter them on a new browser or computer.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-green" onclick="exportCredentials()">⬇ Export Keys</button>
+              <button class="btn btn-secondary" onclick="document.getElementById('import-creds-input').click()" style="background:rgba(255,255,255,0.1);color:var(--bg);border-color:rgba(255,255,255,0.2)">⬆ Import Keys</button>
+              <input type="file" id="import-creds-input" accept=".json" style="display:none" onchange="importCredentials(this)">
+            </div>
+            <div id="creds-import-status" style="font-size:12px;margin-top:10px;color:rgba(255,255,255,0.5)"></div>
+          </div>
 
     <!-- AI TRAINING -->
     <div id="page-training" class="page">
@@ -2862,7 +2874,45 @@ async function deleteContact(id) {
 // SETTINGS
 // ═══════════════════════════════════════════════════════
 
-function saveApiKey() {
+function exportCredentials() {
+  const creds = {
+    fleischer_sb_url: localStorage.getItem('fleischer_sb_url') || '',
+    fleischer_sb_key: localStorage.getItem('fleischer_sb_key') || '',
+    fleischer_api_key: localStorage.getItem('fleischer_api_key') || '',
+    fleischer_proxy: localStorage.getItem('fleischer_proxy') || '',
+  };
+  const blob = new Blob([JSON.stringify(creds, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'fleischer-credentials.json';
+  a.click();
+  toast('Credentials exported — save this file somewhere safe ✓', 'success');
+}
+
+function importCredentials(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const creds = JSON.parse(e.target.result);
+      if (creds.fleischer_sb_url) localStorage.setItem('fleischer_sb_url', creds.fleischer_sb_url);
+      if (creds.fleischer_sb_key) localStorage.setItem('fleischer_sb_key', creds.fleischer_sb_key);
+      if (creds.fleischer_api_key) localStorage.setItem('fleischer_api_key', creds.fleischer_api_key);
+      if (creds.fleischer_proxy) localStorage.setItem('fleischer_proxy', creds.fleischer_proxy);
+      document.getElementById('creds-import-status').textContent = '✅ Credentials imported — reloading…';
+      toast('Credentials imported ✓ Reloading…', 'success');
+      setTimeout(() => location.reload(), 1500);
+    } catch(e) {
+      document.getElementById('creds-import-status').textContent = '❌ Invalid file — make sure it\'s a fleischer-credentials.json file';
+      toast('Import failed — invalid file', 'error');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+
   const key = document.getElementById('cfg-api-key').value.trim();
   if (!key) { toast('Please enter your API key', 'error'); return; }
   if (!key.startsWith('sk-ant-')) {
@@ -4228,5 +4278,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 </script>
 </body>
 </html>
+
 
 
