@@ -22,20 +22,31 @@ window.parseMsgFile = function(arrayBuffer) {
     let subject='',fromName='',fromEmail='',body=[],headersDone=false;
     for(let i=0;i<runs.length;i++){
       const line=runs[i];
+      // Skip binary/system junk
       if(/substg1|nameid|Root Entry|__attach|BigFunnel|Exchange|FYDIBOHF|namprd|prod\.outlook|protection\.outlook|arcselector|ARC-Seal|ARC-Message|DKIM-Signature/i.test(line))continue;
       if(/^[0-9a-f]{20,}$/i.test(line))continue;
       if(/^[A-Za-z0-9+/]{40,}={0,2}$/.test(line))continue;
-      if(!subject&&line.length>3&&line.length<200&&/^(RE:|FW:|Rate|Quote|Trucking|Drayage|Freight)/i.test(line))subject=line;
+      // Capture metadata
       if(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(line)&&!fromEmail)fromEmail=line;
-      if(/^From:\s+/i.test(line)&&line.includes('@'))fromName=line;
-      if(/^Subject:\s+/i.test(line)&&!subject)subject=line.replace(/^Subject:\s*/i,'');
-      if(headersDone&&line.length>10&&!/^(Received:|ARC-|X-MS-|X-Microsoft|Content-|MIME-|Message-ID:|Thread-|References:|Return-|authentication|x-forefront|x-bess)/i.test(line))body.push(line);
-      if(/^Date:\s+/i.test(line)&&!headersDone)headersDone=true;
+      if(/^From[:\s]/i.test(line)&&line.includes('@'))fromName=line;
+      if(/^Subject[:\s]/i.test(line)&&!subject)subject=line.replace(/^Subject[:\s]*/i,'');
+      if(!subject&&line.length>3&&line.length<200&&/^(RE:|FW:|Rate|Quote|Trucking|Drayage|Freight)/i.test(line))subject=line;
+      // Mark body start — try Date header, but also fall back after seeing From/Subject
+      if(/^Date[:\s]/i.test(line))headersDone=true;
+      if(!headersDone&&fromName&&subject)headersDone=true;
+      // Collect body lines — skip email infrastructure noise
+      if(headersDone&&line.length>5&&!/^(Received:|ARC-|X-MS-|X-Microsoft|Content-Type|Content-Transfer|MIME-Version|Message-ID:|Thread-|References:|Return-Path|authentication|x-forefront|x-bess|x-originating|x-source|x-spam|boundary=|charset=)/i.test(line)){
+        body.push(line);
+      }
+    }
+    // If headersDone never triggered, just use everything that isn't obvious junk
+    if(!body.length){
+      body=runs.filter(l=>l.length>5&&!/^[0-9a-f]{20,}$/i.test(l)&&!/^[A-Za-z0-9+/]{40,}={0,2}$/.test(l));
     }
     const parts=[];
     if(fromName)parts.push(fromName);else if(fromEmail)parts.push('From: '+fromEmail);
     if(subject)parts.push('Subject: '+subject);
-    if(body.length)parts.push('',...body.slice(0,200));
+    if(body.length)parts.push('',...body.slice(0,600));
     return parts.join('\n').trim();
   }catch(e){return '';}
 };
@@ -963,7 +974,7 @@ ${text}`;
 
     const response=await fetch(getApiEndpoint(),{
       method:'POST',headers:getApiHeaders(),
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})
     });
     const data=await response.json();
     if(!response.ok||data.error)throw new Error(data.error?.message||'API error '+response.status);
