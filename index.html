@@ -48,6 +48,7 @@ window.parseMsgFile = function(arrayBuffer) {
   --green:#34c759; --green-light:#e6f9eb;
   --orange:#ff9500; --orange-light:#fff4e0;
   --red:#ff3b30; --red-light:#fff0ef;
+  --indigo:#5856d6; --indigo-light:#eeeeff;
   --border:rgba(60,60,67,0.13); --border-strong:rgba(60,60,67,0.22);
   --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
   --shadow-lg:0 16px 48px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.06);
@@ -59,8 +60,6 @@ window.parseMsgFile = function(arrayBuffer) {
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
 body{font-family:var(--font);background:var(--bg);color:var(--label);min-height:100vh;font-size:14px;line-height:1.5;}
 .app{display:flex;height:100vh;overflow:hidden;}
-
-/* SIDEBAR */
 .sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);background:rgba(255,255,255,.72);backdrop-filter:blur(20px);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
 .sidebar-logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
 .sidebar-logo .wordmark{font-size:17px;font-weight:700;letter-spacing:-.4px;}
@@ -71,35 +70,26 @@ body{font-family:var(--font);background:var(--bg);color:var(--label);min-height:
 .nav-item:hover{background:rgba(0,0,0,.04);color:var(--label);}
 .nav-item.active{background:var(--blue-light);color:var(--blue);font-weight:500;}
 .nav-item .icon{font-size:15px;width:20px;text-align:center;}
-
-/* LAYOUT */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 .topbar{background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .topbar-title{font-size:17px;font-weight:600;letter-spacing:-.3px;}
 .topbar-actions{display:flex;gap:8px;align-items:center;}
 .content{padding:24px;flex:1;}
-
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:var(--font);white-space:nowrap;}
 .btn-primary{background:var(--blue);color:#fff;} .btn-primary:hover{background:#0066dd;}
 .btn-secondary{background:var(--surface);color:var(--label);border:1px solid var(--border-strong);} .btn-secondary:hover{background:var(--surface2);}
-.btn-ghost{background:transparent;color:var(--label2);} .btn-ghost:hover{background:rgba(0,0,0,.05);color:var(--label);}
+.btn-ghost{background:transparent;color:var(--label2);} .btn-ghost:hover{background:rgba(0,0,0,.05);}
 .btn-green{background:var(--green);color:#fff;} .btn-green:hover{background:#2dab4e;}
 .btn-sm{padding:5px 11px;font-size:13px;} .btn-lg{padding:11px 22px;font-size:15px;font-weight:600;}
-
-/* CARDS */
 .card{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;}
 .card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.card-title{font-size:15px;font-weight:600;letter-spacing:-.2px;}
-
-/* BADGES */
+.card-title{font-size:15px;font-weight:600;}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11.5px;font-weight:500;}
 .badge-green{background:var(--green-light);color:#1a8a38;}
 .badge-orange{background:var(--orange-light);color:#c97000;}
 .badge-red{background:var(--red-light);color:var(--red);}
 .badge-gray{background:var(--surface3);color:var(--label2);}
-
-/* FORMS */
+.badge-indigo{background:var(--indigo-light);color:var(--indigo);}
 .form-group{display:flex;flex-direction:column;gap:5px;}
 .form-label{font-size:13px;font-weight:500;color:var(--label2);}
 .form-input,.form-select,.form-textarea{padding:9px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font);color:var(--label);background:var(--surface);transition:all .15s;outline:none;-webkit-appearance:none;}
@@ -107,84 +97,69 @@ body{font-family:var(--font);background:var(--bg);color:var(--label);min-height:
 .form-textarea{resize:vertical;min-height:80px;line-height:1.5;}
 .form-row{display:grid;gap:12px;}
 .form-row.cols-2{grid-template-columns:1fr 1fr;}
+.form-row.cols-3{grid-template-columns:1fr 1fr 1fr;}
 .form-row.cols-4{grid-template-columns:1fr 1fr 1fr 1fr;}
-.mb-4{margin-bottom:16px;} .mb-6{margin-bottom:24px;}
-
-/* TABLE */
+.mb-3{margin-bottom:12px;} .mb-4{margin-bottom:16px;}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
-th{text-align:left;font-size:12px;font-weight:600;color:var(--label3);padding:10px 16px;border-bottom:1px solid var(--border);white-space:nowrap;}
-td{padding:11px 16px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--label3);padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:top;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--surface2);}
-
-/* MODAL */
+tr.main-row:hover td{background:var(--surface2);}
+tr.acc-row td{background:#fafaf8;border-bottom:1px solid var(--border);padding:7px 14px 7px 32px;}
+tr.acc-row:last-child td{border-bottom:none;}
+tr.acc-row td:first-child{color:var(--label3);font-size:12.5px;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
 .modal-overlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;transform:translateY(8px) scale(.99);transition:transform .2s;}
+.modal{background:var(--surface);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;max-width:640px;max-height:90vh;overflow-y:auto;transform:translateY(8px) scale(.99);transition:transform .2s;}
 .modal-overlay.open .modal{transform:translateY(0) scale(1);}
 .modal-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;}
 .modal-title{font-size:17px;font-weight:600;} .modal-subtitle{font-size:13px;color:var(--label3);margin-top:2px;}
 .modal-body{padding:22px;}
 .modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:var(--surface2);border-radius:0 0 var(--radius-xl) var(--radius-xl);}
 .modal-close{background:var(--surface3);border:none;cursor:pointer;font-size:14px;color:var(--label2);padding:4px 8px;border-radius:6px;font-weight:500;}
-.modal-close:hover{background:var(--border-strong);}
-
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
-.stat-card{background:var(--surface);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow-sm);}
-.stat-label{font-size:12px;font-weight:500;color:var(--label3);margin-bottom:6px;}
-.stat-value{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:4px;}
-.stat-sub{font-size:12px;color:var(--label3);}
-
-/* SEARCH */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm);}
+.stat-label{font-size:12px;font-weight:500;color:var(--label3);margin-bottom:5px;}
+.stat-value{font-size:26px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:3px;}
+.stat-sub{font-size:11.5px;color:var(--label3);}
 .search-wrap{position:relative;}
 .search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;}
-.search-input{padding:6px 10px 6px 28px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);outline:none;background:var(--surface);color:var(--label);min-width:180px;transition:all .15s;}
+.search-input{padding:6px 10px 6px 28px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);outline:none;background:var(--surface);color:var(--label);min-width:200px;transition:all .15s;}
 .search-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,122,255,.15);}
-
-/* MISC INPUTS */
-.amount-input{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--font-mono);outline:none;width:90px;background:var(--surface);color:var(--label);}
-.amount-input:focus{border-color:var(--blue);}
-.currency-select{padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--font);outline:none;background:var(--surface);color:var(--label);-webkit-appearance:none;cursor:pointer;}
-
-/* TOAST */
 #toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
-.toast{background:rgba(30,30,30,.92);backdrop-filter:blur(12px);color:#fff;padding:12px 16px;border-radius:var(--radius);font-size:14px;font-weight:500;box-shadow:var(--shadow-lg);animation:slideUp .25s cubic-bezier(.34,1.56,.64,1);max-width:320px;display:flex;align-items:center;gap:8px;}
+.toast{background:rgba(30,30,30,.92);backdrop-filter:blur(12px);color:#fff;padding:12px 16px;border-radius:var(--radius);font-size:14px;font-weight:500;box-shadow:var(--shadow-lg);animation:slideUp .25s cubic-bezier(.34,1.56,.64,1);max-width:340px;}
 .toast.success{background:rgba(52,199,89,.95);} .toast.error{background:rgba(255,59,48,.95);}
 @keyframes slideUp{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-
-/* SPINNERS */
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
 .spinner-dark{display:inline-block;width:24px;height:24px;border:2.5px solid var(--border-strong);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;gap:14px;color:var(--label3);}
-
-/* MISC */
 .section-title{font-size:17px;font-weight:600;margin-bottom:4px;letter-spacing:-.3px;}
 .section-sub{font-size:14px;color:var(--label3);margin-bottom:18px;}
-.flex{display:flex;} .flex-col{display:flex;flex-direction:column;}
-.gap-3{gap:12px;}
-.text-muted{color:var(--label3);} .text-sm{font-size:12.5px;}
-.mono{font-family:var(--font-mono);} .font-medium{font-weight:500;} .font-semibold{font-weight:600;}
+.flex{display:flex;} .flex-col{display:flex;flex-direction:column;} .gap-3{gap:12px;}
+.text-muted{color:var(--label3);} .mono{font-family:var(--font-mono);}
+.font-medium{font-weight:500;} .font-semibold{font-weight:600;}
 .page{display:none;} .page.active{display:block;animation:fadeIn .15s ease;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 .ai-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:20px;font-size:12px;font-weight:600;}
 .drop-zone{border:2px dashed var(--border-strong);border-radius:var(--radius-lg);padding:28px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2);}
 .drop-zone:hover,.drop-zone.dragover{border-color:var(--blue);background:var(--blue-light);}
 .drop-zone-icon{font-size:32px;margin-bottom:10px;} .drop-zone-text{font-size:14px;color:var(--label2);line-height:1.5;}
-.parsed-field{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;background:var(--surface2);margin-bottom:6px;}
-.parsed-field-label{font-size:12px;font-weight:500;color:var(--label3);min-width:100px;padding-top:1px;}
-.parsed-field-value{font-size:14px;color:var(--label);flex:1;}
+.parsed-field{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-radius:8px;background:var(--surface2);margin-bottom:5px;}
+.parsed-field-label{font-size:12px;font-weight:500;color:var(--label3);min-width:110px;padding-top:1px;}
+.parsed-field-value{font-size:13.5px;color:var(--label);flex:1;}
 .parsed-field-value[contenteditable="true"]:focus{outline:2px solid var(--blue);border-radius:4px;padding:1px 4px;}
 @keyframes sbpulse{0%,100%{opacity:.4}50%{opacity:1}}
 .setup-banner{background:linear-gradient(135deg,#1c1c1e,#2c2c2e);color:#fff;border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .setup-banner h3{font-size:15px;font-weight:600;margin-bottom:4px;} .setup-banner p{font-size:13px;opacity:.6;}
-@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.acc-toggle{background:none;border:none;cursor:pointer;font-size:12px;color:var(--blue);padding:2px 6px;border-radius:4px;font-family:var(--font);font-weight:500;}
+.acc-toggle:hover{background:var(--blue-light);}
+.fuel-incl{font-size:12px;color:var(--label3);font-style:italic;}
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
-
 <script>
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -196,8 +171,6 @@ function showPage(id) {
 </script>
 
 <div class="app">
-
-<!-- ── SIDEBAR ── -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="wordmark">FLEISCHER</div>
@@ -206,33 +179,26 @@ function showPage(id) {
   <nav>
     <div class="nav-section">
       <div class="nav-label">Rates</div>
-      <div class="nav-item active" onclick="showPage('rates')">
-        <span class="icon">🚛</span> Trucking Rates
-      </div>
-      <div class="nav-item" onclick="showPage('parse')">
-        <span class="icon">✉️</span> Parse Email
-      </div>
+      <div class="nav-item active" onclick="showPage('rates')"><span class="icon">🚛</span> Trucking Rates</div>
+      <div class="nav-item" onclick="showPage('parse')"><span class="icon">✉️</span> Parse Email</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">System</div>
-      <div class="nav-item" onclick="showPage('settings')">
-        <span class="icon">⚙️</span> Settings
-      </div>
+      <div class="nav-item" onclick="showPage('settings')"><span class="icon">⚙️</span> Settings</div>
     </div>
   </nav>
 </aside>
 
-<!-- ── MAIN ── -->
 <main class="main">
 
-  <!-- TRUCKING RATES PAGE -->
+  <!-- TRUCKING RATES -->
   <div id="page-rates" class="page active">
     <div class="topbar">
       <div class="topbar-title">Trucking Rates</div>
       <div class="topbar-actions">
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
-          <input class="search-input" placeholder="Search rates..." id="rate-search" oninput="renderRates()">
+          <input class="search-input" placeholder="Search carrier, origin, ZIP…" id="rate-search" oninput="renderRates()">
         </div>
         <button class="btn btn-secondary btn-sm" onclick="openModal('add-rate-modal')">+ Add Rate</button>
         <button class="btn btn-primary btn-sm" onclick="showPage('parse')">✉️ Parse Email</button>
@@ -246,14 +212,13 @@ function showPage(id) {
           <table>
             <thead><tr>
               <th>Trucker / Carrier</th>
-              <th>Origin</th>
-              <th>Destination</th>
-              <th>Rate</th>
-              <th>Currency</th>
-              <th>Unit</th>
+              <th>Origin → Dest ZIP</th>
+              <th>Line Haul</th>
+              <th>Fuel</th>
+              <th>Date Issued</th>
               <th>Valid Until</th>
-              <th>Status</th>
-              <th>Notes</th>
+              <th>Requested By</th>
+              <th>Accessorials</th>
               <th></th>
             </tr></thead>
             <tbody id="rates-table-body"></tbody>
@@ -263,7 +228,7 @@ function showPage(id) {
     </div>
   </div>
 
-  <!-- PARSE EMAIL PAGE -->
+  <!-- PARSE EMAIL -->
   <div id="page-parse" class="page">
     <div class="topbar">
       <div class="topbar-title">Parse Trucking Quote Email</div>
@@ -271,192 +236,138 @@ function showPage(id) {
     </div>
     <div class="content">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
-
         <div>
           <div class="section-title">Import a Trucker Rate</div>
-          <div class="section-sub">Drop or paste an email from a trucker. FLEISCHER will extract the rate details and save them to your library.</div>
-
+          <div class="section-sub">Drop or paste an email. FLEISCHER extracts the line haul, fuel, and all accessorials separately.</div>
           <div class="drop-zone mb-4" id="drop-zone">
             <div class="drop-zone-icon">📧</div>
-            <div class="drop-zone-text">
-              <strong>Drop email here</strong> — .msg, .eml, or .txt<br>
-              <span style="font-size:12px;color:var(--label3);margin-top:4px;display:block">Drag directly from Outlook or your file system</span>
-            </div>
+            <div class="drop-zone-text"><strong>Drop email here</strong> — .msg, .eml, or .txt<br><span style="font-size:12px;color:var(--label3);margin-top:4px;display:block">Drag directly from Outlook</span></div>
           </div>
-
           <div class="form-group mb-4">
             <label class="form-label">Paste email text</label>
             <textarea class="form-textarea" id="email-paste-area" rows="14" placeholder="Paste the trucker's email or rate quote here…"></textarea>
           </div>
           <button class="btn btn-primary btn-lg" onclick="parseEmail()" id="parse-btn" style="width:100%">✦ Parse with AI</button>
         </div>
-
         <div>
           <div id="parse-loading" style="display:none">
-            <div class="loading-overlay">
-              <div class="spinner-dark"></div>
-              <div class="text-muted">Analyzing with Claude AI…</div>
-            </div>
+            <div class="loading-overlay"><div class="spinner-dark"></div><div class="text-muted">Analyzing with Claude AI…</div></div>
           </div>
-
           <div id="parse-results" style="display:none">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
               <div class="section-title" style="margin-bottom:0">Extracted Data</div>
               <span class="ai-badge">✦ Claude</span>
             </div>
-
             <div class="card mb-4">
-              <div class="card-header">
-                <span class="card-title">Rate Details</span>
-                <span class="badge badge-gray">🚛 Trucking</span>
-              </div>
+              <div class="card-header"><span class="card-title">Rate Details</span></div>
               <div style="padding:14px" id="parsed-fields"></div>
             </div>
-
-            <div class="card mb-4" id="parsed-line-items-card" style="display:none">
+            <div class="card mb-4" id="parsed-acc-card" style="display:none">
               <div class="card-header">
-                <span class="card-title">Rate Lines</span>
-                <button class="btn btn-ghost btn-sm" onclick="addParsedLine()">+ Add</button>
+                <span class="card-title">Accessorial Charges</span>
+                <button class="btn btn-ghost btn-sm" onclick="addParsedAcc()">+ Add</button>
               </div>
               <div class="table-wrap">
-                <table>
-                  <thead><tr><th>Description</th><th>Amount</th><th>Currency</th><th>Unit</th><th></th></tr></thead>
-                  <tbody id="parsed-lines-body"></tbody>
-                </table>
+                <table><thead><tr><th>Description</th><th>Amount</th><th>Currency</th><th></th></tr></thead>
+                <tbody id="parsed-acc-body"></tbody></table>
               </div>
             </div>
-
             <div style="display:flex;gap:8px;justify-content:space-between">
               <button class="btn btn-secondary" onclick="clearParse()">Clear</button>
               <button class="btn btn-primary btn-lg" onclick="saveToRateLibrary()">💾 Save to Library</button>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- SETTINGS PAGE -->
+  <!-- SETTINGS -->
   <div id="page-settings" class="page">
     <div class="topbar"><div class="topbar-title">Settings</div></div>
     <div class="content">
       <div style="max-width:600px">
-
-        <!-- Supabase -->
         <div style="padding:24px;background:var(--label);border-radius:var(--radius-lg);color:#fff;margin-bottom:20px">
           <div style="font-size:18px;font-weight:600;margin-bottom:4px">🔌 Database Connection</div>
-          <div style="font-size:13px;opacity:.55;margin-bottom:20px">Supabase stores your rates in the cloud so they sync across your whole team. Enter credentials once per browser.</div>
-          <div id="sb-connected-banner" style="display:none;padding:10px 14px;background:rgba(52,199,89,.2);border-radius:8px;color:#a8d4b0;font-size:13px;font-weight:500;margin-bottom:16px">
-            ✅ Connected to Supabase — data is syncing to the cloud
-          </div>
+          <div style="font-size:13px;opacity:.55;margin-bottom:20px">Supabase stores your rates in the cloud and syncs across your whole team.</div>
+          <div id="sb-connected-banner" style="display:none;padding:10px 14px;background:rgba(52,199,89,.2);border-radius:8px;color:#a8d4b0;font-size:13px;font-weight:500;margin-bottom:16px">✅ Connected to Supabase — data is syncing to the cloud</div>
           <div class="flex-col gap-3">
             <div class="form-group">
               <label class="form-label" style="color:rgba(255,255,255,.5)">Supabase Project URL</label>
-              <input class="form-input" id="cfg-sb-url" placeholder="https://xxxx.supabase.co"
-                style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff">
+              <input class="form-input" id="cfg-sb-url" placeholder="https://xxxx.supabase.co" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff">
             </div>
             <div class="form-group">
               <label class="form-label" style="color:rgba(255,255,255,.5)">Supabase Anon / Publishable Key</label>
-              <input class="form-input" id="cfg-sb-key" placeholder="sb_publishable_... or eyJhbGci..."
-                style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;font-family:var(--font-mono);font-size:12px">
-              <span style="font-size:12px;color:rgba(255,255,255,.35);margin-top:2px">Found in Supabase → Settings → API</span>
+              <input class="form-input" id="cfg-sb-key" placeholder="sb_publishable_..." style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;font-family:var(--font-mono);font-size:12px">
             </div>
             <button class="btn btn-green" onclick="saveSupabaseConfig()" style="width:fit-content">🔌 Connect & Save</button>
           </div>
         </div>
-
-        <!-- Anthropic -->
         <div style="padding:24px;background:var(--label);border-radius:var(--radius-lg);color:#fff;margin-bottom:20px">
           <div style="font-size:18px;font-weight:600;margin-bottom:4px">✦ AI Parse (Anthropic)</div>
-          <div style="font-size:13px;opacity:.55;margin-bottom:20px">Required for the "Parse Email" AI feature. Get your key at console.anthropic.com</div>
+          <div style="font-size:13px;opacity:.55;margin-bottom:20px">Required for the Parse Email feature. Get your key at console.anthropic.com</div>
           <div class="form-group" style="margin-bottom:16px">
             <label class="form-label" style="color:rgba(255,255,255,.5)">Anthropic API Key</label>
-            <input class="form-input" id="cfg-api-key" placeholder="sk-ant-api03-..."
-              style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;font-family:var(--font-mono);font-size:12px">
+            <input class="form-input" id="cfg-api-key" placeholder="sk-ant-api03-..." style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;font-family:var(--font-mono);font-size:12px">
             <span id="api-key-status" style="font-size:12px;color:rgba(255,255,255,.4);margin-top:2px"></span>
           </div>
           <button class="btn btn-green" onclick="saveApiKey()" style="width:fit-content">Save API Key</button>
         </div>
-
-        <!-- Credentials import/export -->
         <div style="padding:24px;background:var(--label);border-radius:var(--radius-lg);color:#fff">
           <div style="font-size:18px;font-weight:600;margin-bottom:4px">🔑 Credentials Backup</div>
-          <div style="font-size:13px;opacity:.55;margin-bottom:20px">Export your credentials to a file, then import on any other browser to skip re-entering them.</div>
+          <div style="font-size:13px;opacity:.55;margin-bottom:20px">Export to a file, import on any browser to skip re-entering.</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn btn-green" onclick="exportCredentials()">⬇ Export Credentials</button>
-            <label class="btn btn-secondary" style="cursor:pointer">
-              ⬆ Import Credentials
-              <input type="file" accept=".json" style="display:none" onchange="importCredentials(this)">
+            <button class="btn btn-green" onclick="exportCredentials()">⬇ Export</button>
+            <label class="btn btn-secondary" style="cursor:pointer;background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">
+              ⬆ Import<input type="file" accept=".json" style="display:none" onchange="importCredentials(this)">
             </label>
           </div>
           <div id="creds-import-status" style="font-size:12px;color:rgba(255,255,255,.4);margin-top:10px"></div>
         </div>
-
       </div>
     </div>
   </div>
 
 </main>
-</div><!-- /.app -->
+</div>
 
 <!-- ADD RATE MODAL -->
 <div class="modal-overlay" id="add-rate-modal">
   <div class="modal">
     <div class="modal-header">
-      <div>
-        <div class="modal-title">Add Trucking Rate</div>
-        <div class="modal-subtitle">Manually add a trucker rate to the library</div>
-      </div>
+      <div><div class="modal-title">Add Trucking Rate</div><div class="modal-subtitle">Manually add a rate to the library</div></div>
       <button class="modal-close" onclick="closeModal('add-rate-modal')">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-row cols-2 mb-4">
-        <div class="form-group">
-          <label class="form-label">Trucker / Carrier *</label>
-          <input class="form-input" id="ar-carrier" placeholder="Pacific Drayage LLC">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Contact Email</label>
-          <input class="form-input" id="ar-email" placeholder="ops@trucker.com" type="email">
-        </div>
+        <div class="form-group"><label class="form-label">Trucker / Carrier *</label><input class="form-input" id="ar-carrier" placeholder="Pacific Drayage LLC"></div>
+        <div class="form-group"><label class="form-label">Carrier Email</label><input class="form-input" id="ar-email" placeholder="ops@trucker.com" type="email"></div>
       </div>
       <div class="form-row cols-2 mb-4">
-        <div class="form-group">
-          <label class="form-label">Origin *</label>
-          <input class="form-input" id="ar-origin" placeholder="Long Beach, CA">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Destination *</label>
-          <input class="form-input" id="ar-dest" placeholder="Inland Empire, CA">
-        </div>
+        <div class="form-group"><label class="form-label">Carrier Phone</label><input class="form-input" id="ar-phone" placeholder="+1 310 555 0000"></div>
+        <div class="form-group"><label class="form-label">Requested By (your employee)</label><input class="form-input" id="ar-reqby" placeholder="e.g. Maria Chen"></div>
       </div>
-      <div class="form-row cols-4 mb-4">
-        <div class="form-group">
-          <label class="form-label">Rate</label>
-          <input class="form-input" id="ar-rate" type="number" placeholder="650">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Currency</label>
-          <select class="form-select" id="ar-currency">
-            <option>USD</option><option>EUR</option><option>CAD</option><option>MXN</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Unit</label>
-          <select class="form-select" id="ar-unit">
-            <option>per lane</option><option>per mile</option><option>20ft</option>
-            <option>40ft</option><option>40HC</option><option>FCL</option><option>per shipment</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Valid Until</label>
-          <input class="form-input" id="ar-valid" type="date">
-        </div>
+      <div class="form-row cols-2 mb-4">
+        <div class="form-group"><label class="form-label">Origin *</label><input class="form-input" id="ar-origin" placeholder="Long Beach, CA"></div>
+        <div class="form-group"><label class="form-label">Origin ZIP</label><input class="form-input" id="ar-originzip" placeholder="90802"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Notes / Surcharges</label>
-        <textarea class="form-textarea" id="ar-notes" rows="3" placeholder="Drop-hook available, fuel included…"></textarea>
+      <div class="form-row cols-2 mb-4">
+        <div class="form-group"><label class="form-label">Destination *</label><input class="form-input" id="ar-dest" placeholder="Inland Empire, CA"></div>
+        <div class="form-group"><label class="form-label">Destination ZIP</label><input class="form-input" id="ar-destzip" placeholder="92376"></div>
+      </div>
+      <div class="form-row cols-3 mb-4">
+        <div class="form-group"><label class="form-label">Line Haul Rate *</label><input class="form-input" id="ar-rate" type="number" placeholder="650"></div>
+        <div class="form-group"><label class="form-label">Currency</label>
+          <select class="form-select" id="ar-currency"><option>USD</option><option>EUR</option><option>CAD</option><option>MXN</option></select></div>
+        <div class="form-group"><label class="form-label">Fuel Surcharge</label><input class="form-input" id="ar-fuel" placeholder="75 or leave blank if included"></div>
+      </div>
+      <div class="form-row cols-2 mb-4">
+        <div class="form-group"><label class="form-label">Date Issued</label><input class="form-input" id="ar-issued" type="date"></div>
+        <div class="form-group"><label class="form-label">Valid Until</label><input class="form-input" id="ar-valid" type="date"></div>
+      </div>
+      <div class="form-group mb-4">
+        <label class="form-label">Accessorial Charges <span style="font-weight:400;color:var(--label3)">(one per line: "Chassis Split $75")</span></label>
+        <textarea class="form-textarea" id="ar-acc" rows="3" placeholder="Chassis Split $75&#10;Pre-pull $125&#10;Detention $65/hr"></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -471,25 +382,15 @@ function showPage(id) {
 <script>
 // ═══════════════════════════════════════════════════════
 // CREDENTIALS
-// Credentials live in localStorage — entered once in Settings.
-// Never hardcoded so the published site stays safe.
 // ═══════════════════════════════════════════════════════
 function getSbUrl() { return localStorage.getItem('fleischer_sb_url') || ''; }
 function getSbKey() { return localStorage.getItem('fleischer_sb_key') || ''; }
 function sbReady()  { return !!(getSbUrl() && getSbKey()); }
 
-// Anthropic API — called directly from the browser
-function getApiEndpoint() {
-  return 'https://api.anthropic.com/v1/messages';
-}
+function getApiEndpoint() { return 'https://api.anthropic.com/v1/messages'; }
 function getApiHeaders() {
   const key = localStorage.getItem('fleischer_api_key') || '';
-  return {
-    'Content-Type': 'application/json',
-    'x-api-key': key,
-    'anthropic-version': '2023-06-01',
-    'anthropic-dangerous-direct-browser-access': 'true',
-  };
+  return { 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' };
 }
 
 // ═══════════════════════════════════════════════════════
@@ -497,36 +398,38 @@ function getApiHeaders() {
 // ═══════════════════════════════════════════════════════
 function sbH() {
   const k = getSbKey();
-  return { apikey: k, Authorization: `Bearer ${k}`, 'Content-Type': 'application/json', Accept: 'application/json', 'X-Client-Info': 'fleischer/1.0' };
+  return { apikey:k, Authorization:`Bearer ${k}`, 'Content-Type':'application/json', Accept:'application/json', 'X-Client-Info':'fleischer/1.0' };
 }
-async function sbSelect(table, filters = '') {
-  const res = await fetch(`${getSbUrl()}/rest/v1/${table}?${filters}&order=id.desc`, { headers: sbH() });
-  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+async function sbSelect(table, filters='') {
+  const res = await fetch(`${getSbUrl()}/rest/v1/${table}?${filters}&order=id.desc`, { headers:sbH() });
+  if (!res.ok) { const t=await res.text(); throw new Error(`${res.status}: ${t}`); }
   return res.json();
 }
 async function sbInsert(table, row) {
-  const res = await fetch(`${getSbUrl()}/rest/v1/${table}`, {
-    method: 'POST', headers: { ...sbH(), Prefer: 'return=representation' }, body: JSON.stringify(row)
-  });
-  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  const res = await fetch(`${getSbUrl()}/rest/v1/${table}`, { method:'POST', headers:{...sbH(),Prefer:'return=representation'}, body:JSON.stringify(row) });
+  if (!res.ok) { const t=await res.text(); throw new Error(`${res.status}: ${t}`); }
   return res.json();
 }
 async function sbUpdate(table, id, row) {
-  const res = await fetch(`${getSbUrl()}/rest/v1/${table}?id=eq.${id}`, {
-    method: 'PATCH', headers: { ...sbH(), Prefer: 'return=representation' }, body: JSON.stringify(row)
-  });
-  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  const res = await fetch(`${getSbUrl()}/rest/v1/${table}?id=eq.${id}`, { method:'PATCH', headers:{...sbH(),Prefer:'return=representation'}, body:JSON.stringify(row) });
+  if (!res.ok) { const t=await res.text(); throw new Error(`${res.status}: ${t}`); }
   return res.json();
 }
 async function sbDeleteRow(table, id) {
-  const res = await fetch(`${getSbUrl()}/rest/v1/${table}?id=eq.${id}`, { method: 'DELETE', headers: sbH() });
-  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  const res = await fetch(`${getSbUrl()}/rest/v1/${table}?id=eq.${id}`, { method:'DELETE', headers:sbH() });
+  if (!res.ok) { const t=await res.text(); throw new Error(`${res.status}: ${t}`); }
 }
 
 // ═══════════════════════════════════════════════════════
-// LOCAL DB  (localStorage fallback when Supabase not set up)
+// LOCAL DB
+// Rate shape:
+//   id, carrier, carrierEmail, carrierPhone,
+//   origin, originZip, dest, destZip,
+//   lineHaul, currency, fuel (number or "INCL"),
+//   dateIssued, validUntil, requestedBy,
+//   accessorials: [{description, amount, currency}]
 // ═══════════════════════════════════════════════════════
-const DB_KEY = 'fleischer_trucking_v1';
+const DB_KEY = 'fleischer_trucking_v2';
 function initDB() {
   const fmt = d => d.toISOString().split('T')[0];
   const add = (d,n) => { const r=new Date(d); r.setDate(r.getDate()+n); return r; };
@@ -534,16 +437,16 @@ function initDB() {
   const t = new Date();
   return {
     rates: [
-      { id:'r1', carrier:'Pacific Drayage LLC', origin:'Long Beach, CA', dest:'Inland Empire, CA', rate:650, currency:'USD', unit:'per lane', validUntil:fmt(add(t,60)), notes:'', email:'ops@pacificdrayage.com', createdAt:fmt(sub(t,10)) },
-      { id:'r2', carrier:'Pacific Drayage LLC', origin:'Los Angeles, CA', dest:'Long Beach Port',   rate:285, currency:'USD', unit:'per lane', validUntil:fmt(add(t,60)), notes:'Drop-hook available', email:'ops@pacificdrayage.com', createdAt:fmt(sub(t,10)) },
+      { id:'r1', carrier:'Pacific Drayage LLC', carrierEmail:'ops@pacificdrayage.com', carrierPhone:'310-555-0100',
+        origin:'Long Beach, CA', originZip:'90802', dest:'Fontana, CA', destZip:'92335',
+        lineHaul:650, currency:'USD', fuel:'INCL',
+        dateIssued:fmt(sub(t,10)), validUntil:fmt(add(t,50)), requestedBy:'Maria Chen',
+        accessorials:[{description:'Chassis Split',amount:75,currency:'USD'},{description:'Pre-pull',amount:125,currency:'USD'}] },
     ],
-    rateCounter: 3
+    rateCounter: 2
   };
 }
-function loadDB() {
-  try { const r = localStorage.getItem(DB_KEY); if (r) return JSON.parse(r); } catch(e) {}
-  return initDB();
-}
+function loadDB() { try { const r=localStorage.getItem(DB_KEY); if(r) return JSON.parse(r); } catch(e){} return initDB(); }
 function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 let db = loadDB();
 
@@ -553,44 +456,59 @@ let db = loadDB();
 async function loadFromSupabase() {
   if (!sbReady()) return;
   const bar = document.createElement('div');
-  bar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:3px;background:var(--blue);z-index:9999;animation:sbpulse 1s ease-in-out infinite';
+  bar.style.cssText='position:fixed;top:0;left:0;right:0;height:3px;background:var(--blue);z-index:9999;animation:sbpulse 1s ease-in-out infinite';
   document.body.appendChild(bar);
-  const to = setTimeout(() => { bar.remove(); toast('DB timeout — check Settings', 'error'); }, 8000);
+  const to = setTimeout(()=>{ bar.remove(); toast('DB timeout — check Settings','error'); }, 8000);
   try {
-    const rows = await sbSelect('rates', 'mode=eq.trucking');
+    const rows = await sbSelect('rates','mode=eq.trucking');
     db.rates = rows.map(r => ({
-      id:         String(r.id),
-      carrier:    r.carrier    || '',
-      origin:     r.origin     || '',
-      dest:       r.dest       || '',
-      rate:       r.rate       || 0,
-      currency:   r.currency   || 'USD',
-      unit:       r.unit       || 'per lane',
-      validUntil: r.valid_until || '',
-      notes:      r.notes      || '',
-      email:      r.email      || '',
-      createdAt:  r.created_at || '',
+      id:           String(r.id),
+      carrier:      r.carrier       || '',
+      carrierEmail: r.email         || '',
+      carrierPhone: r.phone         || '',
+      origin:       r.origin        || '',
+      originZip:    r.origin_zip    || '',
+      dest:         r.dest          || '',
+      destZip:      r.dest_zip      || '',
+      lineHaul:     r.rate          || 0,
+      currency:     r.currency      || 'USD',
+      fuel:         r.fuel          || 'INCL',
+      dateIssued:   r.date_issued   || '',
+      validUntil:   r.valid_until   || '',
+      requestedBy:  r.requested_by  || '',
+      accessorials: (() => { try { return JSON.parse(r.accessorials||'[]'); } catch(e){ return []; } })()
     }));
     saveDB();
     clearTimeout(to); bar.remove();
     renderRates();
-    toast('✓ Database connected', 'success');
+    toast('✓ Database connected','success');
   } catch(e) {
     clearTimeout(to); bar.remove();
-    console.error('Supabase error:', e);
-    toast('DB error: ' + e.message, 'error');
+    console.error('Supabase error:',e);
+    toast('DB error: '+e.message,'error');
   }
 }
 
 async function sbSaveRate(r) {
   if (!sbReady()) { saveDB(); return; }
   const row = {
-    carrier: r.carrier, mode: 'trucking', origin: r.origin, dest: r.dest,
-    rate: r.rate, currency: r.currency, unit: r.unit,
-    valid_until: r.validUntil || null, notes: r.notes || '',
-    email: r.email || '', created_at: r.createdAt
+    carrier:      r.carrier,
+    mode:         'trucking',
+    origin:       r.origin,
+    origin_zip:   r.originZip   || null,
+    dest:         r.dest,
+    dest_zip:     r.destZip     || null,
+    rate:         r.lineHaul,
+    currency:     r.currency,
+    fuel:         r.fuel        || 'INCL',
+    date_issued:  r.dateIssued  || null,
+    valid_until:  r.validUntil  || null,
+    email:        r.carrierEmail|| '',
+    phone:        r.carrierPhone|| '',
+    requested_by: r.requestedBy || '',
+    accessorials: JSON.stringify(r.accessorials || []),
+    notes:        '',
   };
-  // IDs that start with 'r' + digits are local-only; numeric IDs are Supabase rows
   if (r.id && !String(r.id).match(/^r\d/)) {
     await sbUpdate('rates', r.id, row);
   } else {
@@ -609,38 +527,29 @@ async function sbDeleteRate(id) {
 // ═══════════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════════
-function uid(p) { return p + Date.now() + Math.random().toString(36).slice(2,6); }
 function fmtMoney(n, cur='USD') {
-  const v = parseFloat(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  return cur === 'USD' ? '$' + v : v + ' ' + cur;
+  if (!n && n !== 0) return '—';
+  const v = parseFloat(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return cur==='USD' ? '$'+v : v+' '+cur;
 }
-function fmtDate(d) {
-  if (!d) return '—';
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-}
-function daysUntil(ds) {
-  if (!ds) return null;
-  return Math.round((new Date(ds + 'T12:00:00') - new Date()) / 86400000);
-}
-function rateStatus(r) {
+function fmtDate(d) { if(!d) return '—'; return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function daysUntil(ds) { if(!ds) return null; return Math.round((new Date(ds+'T12:00:00')-new Date())/86400000); }
+function validityBadge(r) {
   const d = daysUntil(r.validUntil);
-  if (d === null) return { label: 'No expiry',        cls: 'badge-gray'   };
-  if (d < 0)     return { label: 'Expired',           cls: 'badge-red'    };
-  if (d <= 14)   return { label: `Expires in ${d}d`,  cls: 'badge-red'    };
-  if (d <= 45)   return { label: `${d}d left`,        cls: 'badge-orange' };
-  return               { label: `Valid ${fmtDate(r.validUntil)}`, cls: 'badge-green' };
+  if (d===null) return '';
+  if (d<0)   return `<span class="badge badge-red" style="font-size:11px">Expired</span>`;
+  if (d<=14) return `<span class="badge badge-red" style="font-size:11px">${d}d left</span>`;
+  if (d<=45) return `<span class="badge badge-orange" style="font-size:11px">${d}d left</span>`;
+  return `<span class="badge badge-green" style="font-size:11px">Valid</span>`;
 }
 function toast(msg, type='') {
-  const t = document.createElement('div');
-  t.className = 'toast ' + type; t.textContent = msg;
+  const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
   document.getElementById('toast-container').appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+  setTimeout(()=>t.remove(),3500);
 }
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
-});
+document.addEventListener('click', e=>{ if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); });
 
 // ═══════════════════════════════════════════════════════
 // SETUP BANNER
@@ -650,83 +559,100 @@ function renderSetupBanner() {
   if (!w) return;
   w.innerHTML = sbReady() ? '' : `
     <div class="setup-banner">
-      <div>
-        <h3>⚙️ Database not connected</h3>
-        <p>Enter your Supabase credentials in Settings to sync rates across your team.</p>
-      </div>
+      <div><h3>⚙️ Database not connected</h3><p>Enter your Supabase credentials in Settings to sync rates across your team.</p></div>
       <button class="btn btn-primary btn-sm" onclick="showPage('settings')">Open Settings →</button>
     </div>`;
 }
 
 // ═══════════════════════════════════════════════════════
-// STATS + RATE TABLE
+// STATS
 // ═══════════════════════════════════════════════════════
 function renderStats() {
   const total    = db.rates.length;
-  const expiring = db.rates.filter(r => { const d=daysUntil(r.validUntil); return d!==null&&d>=0&&d<=30; }).length;
-  const expired  = db.rates.filter(r => { const d=daysUntil(r.validUntil); return d!==null&&d<0; }).length;
+  const expiring = db.rates.filter(r=>{ const d=daysUntil(r.validUntil); return d!==null&&d>=0&&d<=30; }).length;
+  const expired  = db.rates.filter(r=>{ const d=daysUntil(r.validUntil); return d!==null&&d<0; }).length;
+  const carriers = new Set(db.rates.map(r=>r.carrier)).size;
   document.getElementById('rate-stats').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">Total Rates</div>
-      <div class="stat-value">${total}</div>
-      <div class="stat-sub">Trucking rates on file</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Expiring Soon</div>
-      <div class="stat-value" style="color:var(--orange)">${expiring}</div>
-      <div class="stat-sub">Within the next 30 days</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Expired</div>
-      <div class="stat-value" style="color:var(--red)">${expired}</div>
-      <div class="stat-sub">Need re-confirmation</div>
-    </div>`;
+    <div class="stat-card"><div class="stat-label">Total Rates</div><div class="stat-value">${total}</div><div class="stat-sub">On file</div></div>
+    <div class="stat-card"><div class="stat-label">Carriers</div><div class="stat-value">${carriers}</div><div class="stat-sub">Unique truckers</div></div>
+    <div class="stat-card"><div class="stat-label">Expiring Soon</div><div class="stat-value" style="color:var(--orange)">${expiring}</div><div class="stat-sub">Within 30 days</div></div>
+    <div class="stat-card"><div class="stat-label">Expired</div><div class="stat-value" style="color:var(--red)">${expired}</div><div class="stat-sub">Need refresh</div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// RATE TABLE  — main rows + expandable accessorial sub-rows
+// ═══════════════════════════════════════════════════════
+const expandedRows = new Set();
+
+function toggleAcc(id) {
+  if (expandedRows.has(id)) expandedRows.delete(id); else expandedRows.add(id);
+  renderRates();
 }
 
 function renderRates() {
   renderSetupBanner();
   renderStats();
-  const q = (document.getElementById('rate-search')?.value || '').toLowerCase();
+  const q = (document.getElementById('rate-search')?.value||'').toLowerCase();
   const rates = q
-    ? db.rates.filter(r => [r.carrier,r.origin,r.dest,r.notes,r.unit,r.email||''].join(' ').toLowerCase().includes(q))
+    ? db.rates.filter(r=>[r.carrier,r.origin,r.dest,r.originZip||'',r.destZip||'',r.requestedBy||'',r.carrierEmail||''].join(' ').toLowerCase().includes(q))
     : db.rates;
   const tbody = document.getElementById('rates-table-body');
   if (!rates.length) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--label3);padding:40px">
-      No trucking rates yet. Click <strong>+ Add Rate</strong> or use <strong>✉️ Parse Email</strong> to get started.
-    </td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--label3);padding:40px">No trucking rates yet. Click <strong>+ Add Rate</strong> or use <strong>✉️ Parse Email</strong>.</td></tr>`;
     return;
   }
-  tbody.innerHTML = rates.map(r => {
-    const st = rateStatus(r);
-    const d  = daysUntil(r.validUntil);
-    const warn = d!==null&&d<0
-      ? `<div style="font-size:11.5px;color:var(--red);margin-top:3px">⚠ Expired — verify before use</div>`
-      : d!==null&&d<=14
-      ? `<div style="font-size:11.5px;color:var(--orange);margin-top:3px">⏰ Needs confirmation soon</div>`
-      : '';
-    return `<tr>
-      <td>
-        <span class="font-medium">${r.carrier}</span>
-        ${r.email ? `<div style="font-size:11.5px;color:var(--label3);margin-top:2px">${r.email}</div>` : ''}
-      </td>
-      <td>${r.origin}</td>
-      <td>${r.dest}</td>
-      <td class="mono font-semibold">${fmtMoney(r.rate, r.currency)}</td>
-      <td><span class="badge badge-gray">${r.currency}</span></td>
-      <td style="color:var(--label3);font-size:12.5px">${r.unit}</td>
-      <td style="font-size:12.5px">${fmtDate(r.validUntil)}</td>
-      <td><span class="badge ${st.cls}">${st.label}</span>${warn}</td>
-      <td style="font-size:12.5px;color:var(--label3);max-width:180px">${r.notes||'—'}</td>
+  let html = '';
+  for (const r of rates) {
+    const accCount = (r.accessorials||[]).length;
+    const expanded = expandedRows.has(r.id);
+    const fuelCell = (!r.fuel || r.fuel==='INCL')
+      ? `<span class="fuel-incl">INCL</span>`
+      : `<span class="mono">${fmtMoney(r.fuel, r.currency)}</span>`;
+    const originDest = `
+      <div style="font-size:13px">${r.origin||'—'}</div>
+      ${(r.originZip||r.destZip) ? `<div style="font-size:11.5px;color:var(--label3);font-family:var(--font-mono)">${r.originZip||'?'} → ${r.destZip||'?'}</div>` : ''}
+      <div style="font-size:12px;color:var(--label3);margin-top:1px">${r.dest||''}</div>`;
+    const carrierCell = `
+      <div class="font-medium">${r.carrier}</div>
+      ${r.carrierEmail ? `<div style="font-size:11.5px;color:var(--blue);margin-top:2px">${r.carrierEmail}</div>` : ''}
+      ${r.carrierPhone ? `<div style="font-size:11.5px;color:var(--label3)">${r.carrierPhone}</div>` : ''}`;
+    const reqBy = r.requestedBy
+      ? `<span class="badge badge-indigo" style="font-size:11px">${r.requestedBy}</span>`
+      : '<span style="color:var(--label3);font-size:12px">—</span>';
+    const accBtn = accCount > 0
+      ? `<button class="acc-toggle" onclick="toggleAcc('${r.id}')">${expanded?'▲':'▼'} ${accCount} charge${accCount>1?'s':''}</button>`
+      : `<span style="font-size:12px;color:var(--label3)">—</span>`;
+
+    html += `<tr class="main-row">
+      <td>${carrierCell}</td>
+      <td>${originDest}</td>
+      <td class="mono font-semibold">${fmtMoney(r.lineHaul, r.currency)}</td>
+      <td>${fuelCell}</td>
+      <td style="font-size:12.5px;color:var(--label3)">${fmtDate(r.dateIssued)}</td>
+      <td style="font-size:12.5px">${fmtDate(r.validUntil)} ${validityBadge(r)}</td>
+      <td>${reqBy}</td>
+      <td>${accBtn}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="deleteRate('${r.id}')">🗑</button></td>
     </tr>`;
-  }).join('');
+
+    if (expanded && accCount > 0) {
+      for (const a of r.accessorials) {
+        html += `<tr class="acc-row">
+          <td colspan="2" style="padding-left:32px;color:var(--label2)">↳ ${a.description}</td>
+          <td class="mono" style="color:var(--label2)">${fmtMoney(a.amount, a.currency||r.currency)}</td>
+          <td colspan="6"></td>
+        </tr>`;
+      }
+    }
+  }
+  tbody.innerHTML = html;
 }
 
 async function deleteRate(id) {
   if (!confirm('Delete this rate?')) return;
-  db.rates = db.rates.filter(r => r.id !== id);
-  try { await sbDeleteRate(id); } catch(e) { console.error(e); }
+  db.rates = db.rates.filter(r=>r.id!==id);
+  expandedRows.delete(id);
+  try { await sbDeleteRate(id); } catch(e){ console.error(e); }
   renderRates();
   toast('Rate deleted');
 }
@@ -735,30 +661,40 @@ async function saveManualRate() {
   const carrier = document.getElementById('ar-carrier').value.trim();
   const origin  = document.getElementById('ar-origin').value.trim();
   const dest    = document.getElementById('ar-dest').value.trim();
-  if (!carrier || !origin || !dest) { toast('Please fill Trucker, Origin, and Destination', 'error'); return; }
+  if (!carrier||!origin||!dest) { toast('Please fill Carrier, Origin, and Destination','error'); return; }
+
+  const fuelRaw = document.getElementById('ar-fuel').value.trim();
+  const fuel = fuelRaw ? (parseFloat(fuelRaw)||fuelRaw) : 'INCL';
+
+  // Parse accessorials from textarea
+  const accText = document.getElementById('ar-acc').value.trim();
+  const accessorials = accText ? accText.split('\n').filter(Boolean).map(line => {
+    const m = line.match(/^(.+?)\s+\$?([\d.]+)\s*(?:USD|EUR|CAD|MXN)?$/i);
+    return m ? { description: m[1].trim(), amount: parseFloat(m[2]), currency: document.getElementById('ar-currency').value }
+             : { description: line.trim(), amount: 0, currency: document.getElementById('ar-currency').value };
+  }) : [];
+
   const r = {
-    id: 'r' + db.rateCounter++, carrier, origin, dest,
-    rate:       parseFloat(document.getElementById('ar-rate').value) || 0,
-    currency:   document.getElementById('ar-currency').value,
-    unit:       document.getElementById('ar-unit').value,
-    validUntil: document.getElementById('ar-valid').value || '',
-    notes:      document.getElementById('ar-notes').value.trim(),
-    email:      document.getElementById('ar-email').value.trim(),
-    createdAt:  new Date().toISOString().split('T')[0],
+    id: 'r'+db.rateCounter++, carrier, origin, dest,
+    carrierEmail: document.getElementById('ar-email').value.trim(),
+    carrierPhone: document.getElementById('ar-phone').value.trim(),
+    originZip:    document.getElementById('ar-originzip').value.trim(),
+    destZip:      document.getElementById('ar-destzip').value.trim(),
+    lineHaul:     parseFloat(document.getElementById('ar-rate').value)||0,
+    currency:     document.getElementById('ar-currency').value,
+    fuel,
+    dateIssued:   document.getElementById('ar-issued').value||'',
+    validUntil:   document.getElementById('ar-valid').value||'',
+    requestedBy:  document.getElementById('ar-reqby').value.trim(),
+    accessorials,
   };
   db.rates.push(r);
-  try {
-    await sbSaveRate(r);
-    toast('Rate saved ✓', 'success');
-  } catch(e) {
-    saveDB();
-    toast('Saved locally (DB error: ' + e.message + ')', 'error');
-  }
+  try { await sbSaveRate(r); toast('Rate saved ✓','success'); }
+  catch(e) { saveDB(); toast('Saved locally (DB: '+e.message+')','error'); }
   closeModal('add-rate-modal');
   renderRates();
-  ['ar-carrier','ar-email','ar-origin','ar-dest','ar-rate','ar-valid','ar-notes'].forEach(i => document.getElementById(i).value = '');
-  document.getElementById('ar-currency').value = 'USD';
-  document.getElementById('ar-unit').value = 'per lane';
+  ['ar-carrier','ar-email','ar-phone','ar-reqby','ar-origin','ar-originzip','ar-dest','ar-destzip','ar-rate','ar-fuel','ar-issued','ar-valid','ar-acc'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('ar-currency').value='USD';
 }
 
 // ═══════════════════════════════════════════════════════
@@ -768,57 +704,58 @@ let parsedData = null;
 
 async function parseEmail() {
   const text = document.getElementById('email-paste-area').value.trim();
-  if (!text) { toast('Please paste email content first', 'error'); return; }
+  if (!text) { toast('Please paste email content first','error'); return; }
+  const apiKey = localStorage.getItem('fleischer_api_key')||'';
+  if (!apiKey) { toast('No API key — add it in Settings first','error'); showPage('settings'); return; }
 
-  const apiKey = localStorage.getItem('fleischer_api_key') || '';
-  if (!apiKey) { toast('No API key — add it in Settings first', 'error'); showPage('settings'); return; }
-
-  document.getElementById('parse-results').style.display  = 'none';
-  document.getElementById('parse-loading').style.display  = 'block';
+  document.getElementById('parse-results').style.display='none';
+  document.getElementById('parse-loading').style.display='block';
   const btn = document.getElementById('parse-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Parsing…';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Parsing…';
 
   try {
-    const prompt = `You are a trucking rate parser. Extract structured rate information from the following trucker's email or quote.
+    const prompt = `You are a trucking/drayage rate parser for a freight forwarding company called Fleischer.
 
-Return ONLY a valid JSON object — no other text, no markdown fences:
+Extract structured rate information from the email below. Follow these rules carefully:
+
+1. LINE HAUL: The primary move charge — inland freight, cartage, drayage, delivery, or line haul rate. This is the MAIN rate.
+2. FUEL: Extract fuel surcharge as a separate number if explicitly stated. If fuel is described as "included" or not mentioned separately, set fuel to "INCL".
+3. ACCESSORIALS: All OTHER charges are accessorials — chassis, chassis split, pre-pull, detention, layover, overweight, hazmat, toll, pier pass, clean truck fee, etc. Do NOT include line haul or fuel here.
+4. CARRIER INFO: Extract the carrier/trucker company name, their email address, and phone number.
+5. FLEISCHER EMPLOYEE: Any email address ending in @fleischer-chb.com belongs to a Fleischer employee who requested this quote. Extract their name as "requestedBy".
+6. DATE ISSUED: The date the email was sent or the quote was issued.
+7. ZIPS: Extract origin and destination ZIP codes if present.
+
+Return ONLY a valid JSON object, no markdown, no extra text:
 {
-  "carrier": "trucker or carrier company name",
-  "contactName": "contact person name or null",
-  "contactEmail": "email address or null",
-  "origin": "pickup city, state",
-  "destination": "delivery city, state",
-  "validFrom": "YYYY-MM-DD or null",
+  "carrier": "trucker company name",
+  "carrierEmail": "carrier email or null",
+  "carrierPhone": "carrier phone number or null",
+  "origin": "city, state",
+  "originZip": "12345 or null",
+  "destination": "city, state",
+  "destZip": "12345 or null",
+  "lineHaul": 650.00,
+  "currency": "USD",
+  "fuel": 75.00 or "INCL",
+  "dateIssued": "YYYY-MM-DD or null",
   "validUntil": "YYYY-MM-DD or null",
-  "notes": "conditions, fuel surcharge, drop-hook, detention — or empty string",
-  "lines": [
-    {
-      "description": "rate description",
-      "amount": 650.00,
-      "currency": "USD",
-      "unit": "per lane"
-    }
+  "requestedBy": "Fleischer employee name or null",
+  "accessorials": [
+    { "description": "Chassis Split", "amount": 75.00, "currency": "USD" },
+    { "description": "Pre-pull", "amount": 125.00, "currency": "USD" }
   ]
 }
-
-Valid unit values: per lane, per mile, 20ft, 40ft, 40HC, FCL, per shipment
 
 EMAIL:
 ${text}`;
 
     const response = await fetch(getApiEndpoint(), {
-      method: 'POST',
-      headers: getApiHeaders(),
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      method:'POST', headers:getApiHeaders(),
+      body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1200, messages:[{role:'user',content:prompt}] })
     });
-
     const data = await response.json();
-    if (!response.ok || data.error) throw new Error(data.error?.message || 'API error ' + response.status);
+    if (!response.ok||data.error) throw new Error(data.error?.message||'API error '+response.status);
     const raw = data.content[0].text;
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('No JSON in response');
@@ -826,102 +763,94 @@ ${text}`;
     renderParsedData(parsedData);
   } catch(e) {
     console.error(e);
-    toast('Parse failed: ' + e.message, 'error');
-    document.getElementById('parse-loading').style.display = 'none';
+    toast('Parse failed: '+e.message,'error');
+    document.getElementById('parse-loading').style.display='none';
   }
-  btn.disabled = false;
-  btn.innerHTML = '✦ Parse with AI';
+  btn.disabled=false; btn.innerHTML='✦ Parse with AI';
 }
 
 function renderParsedData(d) {
-  document.getElementById('parse-loading').style.display = 'none';
-  document.getElementById('parse-results').style.display = 'block';
+  document.getElementById('parse-loading').style.display='none';
+  document.getElementById('parse-results').style.display='block';
 
   const fields = [
-    { label:'Trucker',     key:'carrier',      val: d.carrier      || '—' },
-    { label:'Contact',     key:'contactName',  val: d.contactName  || '—' },
-    { label:'Email',       key:'contactEmail', val: d.contactEmail || '—' },
-    { label:'Origin',      key:'origin',       val: d.origin       || '—' },
-    { label:'Destination', key:'destination',  val: d.destination  || '—' },
-    { label:'Valid From',  key:'validFrom',    val: d.validFrom    || '—' },
-    { label:'Valid Until', key:'validUntil',   val: d.validUntil   || '—' },
-    { label:'Notes',       key:'notes',        val: d.notes        || '—' },
+    {label:'Carrier',       key:'carrier',      val:d.carrier      ||'—'},
+    {label:'Carrier Email', key:'carrierEmail',  val:d.carrierEmail ||'—'},
+    {label:'Carrier Phone', key:'carrierPhone',  val:d.carrierPhone ||'—'},
+    {label:'Origin',        key:'origin',        val:d.origin       ||'—'},
+    {label:'Origin ZIP',    key:'originZip',     val:d.originZip    ||'—'},
+    {label:'Destination',   key:'destination',   val:d.destination  ||'—'},
+    {label:'Dest ZIP',      key:'destZip',       val:d.destZip      ||'—'},
+    {label:'Line Haul',     key:'lineHaul',      val:d.lineHaul     ||'—'},
+    {label:'Fuel',          key:'fuel',          val:d.fuel         ||'INCL'},
+    {label:'Currency',      key:'currency',      val:d.currency     ||'USD'},
+    {label:'Date Issued',   key:'dateIssued',    val:d.dateIssued   ||'—'},
+    {label:'Valid Until',   key:'validUntil',    val:d.validUntil   ||'—'},
+    {label:'Requested By',  key:'requestedBy',   val:d.requestedBy  ||'—'},
   ];
 
-  document.getElementById('parsed-fields').innerHTML = fields.map(f => `
+  document.getElementById('parsed-fields').innerHTML = fields.map(f=>`
     <div class="parsed-field">
       <span class="parsed-field-label">${f.label}</span>
-      <span class="parsed-field-value" contenteditable="true"
-        onblur="updateParsedField('${f.key}',this.textContent)">${f.val}</span>
+      <span class="parsed-field-value" contenteditable="true" onblur="updateParsedField('${f.key}',this.textContent)">${f.val}</span>
     </div>`).join('');
 
-  if (d.lines && d.lines.length) {
-    document.getElementById('parsed-line-items-card').style.display = 'block';
-    document.getElementById('parsed-lines-body').innerHTML = d.lines.map((l,i) => `
+  const accs = d.accessorials||[];
+  if (accs.length) {
+    document.getElementById('parsed-acc-card').style.display='block';
+    document.getElementById('parsed-acc-body').innerHTML = accs.map((a,i)=>`
       <tr>
-        <td><input class="form-input" value="${l.description||''}" style="width:100%"
-          oninput="parsedData.lines[${i}].description=this.value"></td>
-        <td><input class="amount-input" value="${l.amount||0}"
-          oninput="parsedData.lines[${i}].amount=parseFloat(this.value)||0"></td>
-        <td>
-          <select class="currency-select" onchange="parsedData.lines[${i}].currency=this.value">
-            ${['USD','EUR','CAD','MXN'].map(c=>`<option${c===l.currency?' selected':''}>${c}</option>`).join('')}
-          </select>
-        </td>
-        <td>
-          <select class="currency-select" style="width:110px" onchange="parsedData.lines[${i}].unit=this.value">
-            ${['per lane','per mile','20ft','40ft','40HC','FCL','per shipment'].map(u=>`<option${u===l.unit?' selected':''}>${u}</option>`).join('')}
-          </select>
-        </td>
-        <td><button class="btn btn-ghost btn-sm" onclick="removeParsedLine(${i})">🗑</button></td>
+        <td><input class="form-input" value="${a.description||''}" style="width:100%" oninput="parsedData.accessorials[${i}].description=this.value"></td>
+        <td><input class="amount-input" value="${a.amount||0}" style="width:80px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font-mono);font-size:13px;outline:none" oninput="parsedData.accessorials[${i}].amount=parseFloat(this.value)||0"></td>
+        <td><select style="padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;background:var(--surface)" onchange="parsedData.accessorials[${i}].currency=this.value">
+          ${['USD','EUR','CAD','MXN'].map(c=>`<option${c===(a.currency||'USD')?' selected':''}>${c}</option>`).join('')}
+        </select></td>
+        <td><button class="btn btn-ghost btn-sm" onclick="removeParsedAcc(${i})">🗑</button></td>
       </tr>`).join('');
   }
 }
 
-function updateParsedField(key, val) { if (parsedData) parsedData[key] = val.trim(); }
-function addParsedLine() {
+function updateParsedField(key,val) { if(parsedData) parsedData[key]=val.trim(); }
+function addParsedAcc() {
   if (!parsedData) return;
-  if (!parsedData.lines) parsedData.lines = [];
-  parsedData.lines.push({ description:'New rate', amount:0, currency:'USD', unit:'per lane' });
+  if (!parsedData.accessorials) parsedData.accessorials=[];
+  parsedData.accessorials.push({description:'New charge',amount:0,currency:'USD'});
   renderParsedData(parsedData);
 }
-function removeParsedLine(i) {
+function removeParsedAcc(i) {
   if (!parsedData) return;
-  parsedData.lines.splice(i, 1);
+  parsedData.accessorials.splice(i,1);
   renderParsedData(parsedData);
 }
 function clearParse() {
-  parsedData = null;
-  document.getElementById('email-paste-area').value = '';
-  document.getElementById('parse-results').style.display = 'none';
-  document.getElementById('parsed-line-items-card').style.display = 'none';
+  parsedData=null;
+  document.getElementById('email-paste-area').value='';
+  document.getElementById('parse-results').style.display='none';
+  document.getElementById('parsed-acc-card').style.display='none';
 }
 
 async function saveToRateLibrary() {
   if (!parsedData) return;
-  const lines = (parsedData.lines && parsedData.lines.length)
-    ? parsedData.lines
-    : [{ description:'Rate', amount:0, currency:'USD', unit:'per lane' }];
-
-  for (const l of lines) {
-    const r = {
-      id:         'r' + db.rateCounter++,
-      carrier:    parsedData.carrier      || 'Unknown',
-      origin:     parsedData.origin       || '',
-      dest:       parsedData.destination  || '',
-      rate:       l.amount || 0,
-      currency:   l.currency || 'USD',
-      unit:       l.unit || 'per lane',
-      validUntil: parsedData.validUntil   || '',
-      notes:      l.description + (parsedData.notes ? ' | ' + parsedData.notes : ''),
-      email:      parsedData.contactEmail || '',
-      createdAt:  new Date().toISOString().split('T')[0],
-    };
-    db.rates.push(r);
-    try { await sbSaveRate(r); } catch(e) { console.error('Save error:', e); }
-  }
-
-  toast(`${lines.length} rate(s) saved ✓`, 'success');
+  const r = {
+    id:           'r'+db.rateCounter++,
+    carrier:      parsedData.carrier      ||'Unknown',
+    carrierEmail: parsedData.carrierEmail ||'',
+    carrierPhone: parsedData.carrierPhone ||'',
+    origin:       parsedData.origin       ||'',
+    originZip:    parsedData.originZip    ||'',
+    dest:         parsedData.destination  ||'',
+    destZip:      parsedData.destZip      ||'',
+    lineHaul:     parseFloat(parsedData.lineHaul)||0,
+    currency:     parsedData.currency     ||'USD',
+    fuel:         parsedData.fuel         ||'INCL',
+    dateIssued:   parsedData.dateIssued   ||'',
+    validUntil:   parsedData.validUntil   ||'',
+    requestedBy:  parsedData.requestedBy  ||'',
+    accessorials: parsedData.accessorials ||[],
+  };
+  db.rates.push(r);
+  try { await sbSaveRate(r); toast('Rate saved ✓','success'); }
+  catch(e) { saveDB(); toast('Saved locally (DB: '+e.message+')','error'); }
   clearParse();
   showPage('rates');
 }
@@ -930,119 +859,88 @@ async function saveToRateLibrary() {
 // SETTINGS
 // ═══════════════════════════════════════════════════════
 function renderSettingsPage() {
-  document.getElementById('cfg-sb-url').value = getSbUrl();
-  document.getElementById('cfg-sb-key').value = getSbKey();
-  document.getElementById('sb-connected-banner').style.display = sbReady() ? 'block' : 'none';
-
-  const apiKey = localStorage.getItem('fleischer_api_key') || '';
-  document.getElementById('cfg-api-key').value = apiKey;
-  document.getElementById('api-key-status').textContent = apiKey
-    ? '✓ Key saved — ' + apiKey.slice(0,16) + '...'
-    : '⚠ No key saved — AI Parse disabled';
+  document.getElementById('cfg-sb-url').value=getSbUrl();
+  document.getElementById('cfg-sb-key').value=getSbKey();
+  document.getElementById('sb-connected-banner').style.display=sbReady()?'block':'none';
+  const k=localStorage.getItem('fleischer_api_key')||'';
+  document.getElementById('cfg-api-key').value=k;
+  document.getElementById('api-key-status').textContent=k?'✓ Key saved — '+k.slice(0,16)+'...':'⚠ No key saved — AI Parse disabled';
 }
-
 async function saveSupabaseConfig() {
-  const url = document.getElementById('cfg-sb-url').value.trim().replace(/\/$/, '');
-  const key = document.getElementById('cfg-sb-key').value.trim();
-  if (!url || !key) { toast('Both URL and key are required', 'error'); return; }
+  const url=document.getElementById('cfg-sb-url').value.trim().replace(/\/$/,'');
+  const key=document.getElementById('cfg-sb-key').value.trim();
+  if (!url||!key) { toast('Both URL and key required','error'); return; }
   try {
-    const res = await fetch(`${url}/rest/v1/rates?limit=1`, {
-      headers: { apikey:key, Authorization:`Bearer ${key}`, 'Content-Type':'application/json', Accept:'application/json', 'X-Client-Info':'fleischer/1.0' }
-    });
-    if (res.status === 401 || res.status === 403) { toast(`Key rejected (${res.status}) — check your key`, 'error'); return; }
-    // 200, 204, 404, 406 all mean credentials are valid
-  } catch(e) { toast('Cannot reach Supabase: ' + e.message + ' — check your Supabase CORS settings allow fleischer.pages.dev', 'error'); return; }
-
-  localStorage.setItem('fleischer_sb_url', url);
-  localStorage.setItem('fleischer_sb_key', key);
-  document.getElementById('sb-connected-banner').style.display = 'block';
-  toast('Supabase connected! Loading data…', 'success');
+    const res=await fetch(`${url}/rest/v1/rates?limit=1`,{headers:{apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json',Accept:'application/json'}});
+    if (res.status===401||res.status===403) { toast('Key rejected — check your key','error'); return; }
+  } catch(e) { toast('Cannot reach Supabase: '+e.message,'error'); return; }
+  localStorage.setItem('fleischer_sb_url',url);
+  localStorage.setItem('fleischer_sb_key',key);
+  document.getElementById('sb-connected-banner').style.display='block';
+  toast('Supabase connected! Loading data…','success');
   await loadFromSupabase();
 }
-
 function saveApiKey() {
-  const key = document.getElementById('cfg-api-key').value.trim();
-  if (!key) { toast('Please enter an API key', 'error'); return; }
-  localStorage.setItem('fleischer_api_key', key);
-  document.getElementById('api-key-status').textContent = '✓ Key saved — ' + key.slice(0,16) + '...';
-  toast('API key saved ✓', 'success');
+  const k=document.getElementById('cfg-api-key').value.trim();
+  if (!k) { toast('Please enter an API key','error'); return; }
+  localStorage.setItem('fleischer_api_key',k);
+  document.getElementById('api-key-status').textContent='✓ Key saved — '+k.slice(0,16)+'...';
+  toast('API key saved ✓','success');
 }
-
 function exportCredentials() {
-  const creds = {
-    fleischer_sb_url:  localStorage.getItem('fleischer_sb_url')  || '',
-    fleischer_sb_key:  localStorage.getItem('fleischer_sb_key')  || '',
-    fleischer_api_key: localStorage.getItem('fleischer_api_key') || '',
-  };
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(creds, null, 2)], {type:'application/json'}));
-  a.download = 'fleischer-credentials.json';
-  a.click();
-  toast('Credentials exported ✓', 'success');
+  const c={fleischer_sb_url:getSbUrl(),fleischer_sb_key:getSbKey(),fleischer_api_key:localStorage.getItem('fleischer_api_key')||''};
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(c,null,2)],{type:'application/json'}));
+  a.download='fleischer-credentials.json'; a.click();
+  toast('Credentials exported ✓','success');
 }
-
 function importCredentials(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
     try {
-      const c = JSON.parse(e.target.result);
-      if (c.fleischer_sb_url)  localStorage.setItem('fleischer_sb_url',  c.fleischer_sb_url);
-      if (c.fleischer_sb_key)  localStorage.setItem('fleischer_sb_key',  c.fleischer_sb_key);
-      if (c.fleischer_api_key) localStorage.setItem('fleischer_api_key', c.fleischer_api_key);
-      document.getElementById('creds-import-status').textContent = '✅ Imported — reloading…';
-      toast('Credentials imported ✓ Reloading…', 'success');
-      setTimeout(() => location.reload(), 1500);
-    } catch(err) {
-      document.getElementById('creds-import-status').textContent = '❌ Invalid file';
-      toast('Import failed — check the file', 'error');
-    }
+      const c=JSON.parse(e.target.result);
+      if(c.fleischer_sb_url)  localStorage.setItem('fleischer_sb_url',c.fleischer_sb_url);
+      if(c.fleischer_sb_key)  localStorage.setItem('fleischer_sb_key',c.fleischer_sb_key);
+      if(c.fleischer_api_key) localStorage.setItem('fleischer_api_key',c.fleischer_api_key);
+      document.getElementById('creds-import-status').textContent='✅ Imported — reloading…';
+      setTimeout(()=>location.reload(),1500);
+    } catch(err) { document.getElementById('creds-import-status').textContent='❌ Invalid file'; }
   };
-  reader.readAsText(file);
-  input.value = '';
+  reader.readAsText(file); input.value='';
 }
 
 // ═══════════════════════════════════════════════════════
-// DROP ZONE
+// DROP ZONE + INIT
 // ═══════════════════════════════════════════════════════
 async function extractTextFromMsg(buf) {
-  const text = window.parseMsgFile ? window.parseMsgFile(buf) : '';
-  if (text && text.length > 20) return text;
-  return new TextDecoder('utf-8', {fatal:false}).decode(buf);
+  const text=window.parseMsgFile?window.parseMsgFile(buf):'';
+  if(text&&text.length>20) return text;
+  return new TextDecoder('utf-8',{fatal:false}).decode(buf);
 }
 
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async ()=>{
   renderRates();
   await loadFromSupabase();
-
-  const dz = document.getElementById('drop-zone');
-  if (!dz) return;
-  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
-  dz.addEventListener('dragleave', ()  => dz.classList.remove('dragover'));
-  dz.addEventListener('drop', async e => {
+  const dz=document.getElementById('drop-zone');
+  if(!dz) return;
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+  dz.addEventListener('drop',async e=>{
     e.preventDefault(); dz.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (!file) { toast('No file detected', 'error'); return; }
-    const ext = (file.name||'').toLowerCase().split('.').pop();
-    const resetDZ = () => { dz.innerHTML = '<div class="drop-zone-icon">📧</div><div class="drop-zone-text"><strong>Drop email here</strong> — .msg, .eml, or .txt<br><span style="font-size:12px;color:var(--label3);margin-top:4px;display:block">Drag directly from Outlook or your file system</span></div>'; };
-    dz.innerHTML = `<div class="drop-zone-icon">⏳</div><div class="drop-zone-text">Reading <strong>${file.name||'file'}</strong>…</div>`;
+    const file=e.dataTransfer.files[0];
+    if(!file){toast('No file detected','error');return;}
+    const ext=(file.name||'').toLowerCase().split('.').pop();
+    const resetDZ=()=>{dz.innerHTML='<div class="drop-zone-icon">📧</div><div class="drop-zone-text"><strong>Drop email here</strong> — .msg, .eml, or .txt<br><span style="font-size:12px;color:var(--label3);margin-top:4px;display:block">Drag directly from Outlook</span></div>';};
+    dz.innerHTML=`<div class="drop-zone-icon">⏳</div><div class="drop-zone-text">Reading <strong>${file.name||'file'}</strong>…</div>`;
     try {
-      let text = '';
-      if (ext === 'msg' || file.type === 'application/vnd.ms-outlook') {
-        text = await extractTextFromMsg(await file.arrayBuffer());
-      } else {
-        text = await file.text();
-      }
-      if (!text || text.length < 10) { toast('File appears empty — try saving as .txt first', 'error'); resetDZ(); return; }
-      document.getElementById('email-paste-area').value = text;
-      toast('📧 ' + (file.name||'File') + ' loaded ✓', 'success');
-    } catch(err) {
-      toast('Error reading file: ' + err.message, 'error');
-    }
+      let text='';
+      if(ext==='msg'||file.type==='application/vnd.ms-outlook'){text=await extractTextFromMsg(await file.arrayBuffer());}
+      else{text=await file.text();}
+      if(!text||text.length<10){toast('File appears empty — try saving as .txt first','error');resetDZ();return;}
+      document.getElementById('email-paste-area').value=text;
+      toast('📧 '+(file.name||'File')+' loaded ✓','success');
+    } catch(err){toast('Error reading file: '+err.message,'error');}
     resetDZ();
   });
 });
