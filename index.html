@@ -464,7 +464,7 @@ async function loadFromSupabase() {
     db.rates = rows.map(r => ({
       id:           String(r.id),
       carrier:      r.carrier       || '',
-      carrierEmail: r.email         || '',
+      carrierEmail: (() => { const m=(r.notes||'').match(/Email:\s*([^\s|]+)/); return m?m[1]:(r.email||''); })(),
       carrierPhone: r.phone         || '',
       origin:       r.origin        || '',
       originZip:    r.origin_zip    || '',
@@ -491,6 +491,10 @@ async function loadFromSupabase() {
 
 async function sbSaveRate(r) {
   if (!sbReady()) { saveDB(); return; }
+  const contactNote = [
+    r.carrierEmail ? 'Email: ' + r.carrierEmail : '',
+    r.carrierPhone ? 'Tel: '   + r.carrierPhone : '',
+  ].filter(Boolean).join(' | ');
   const row = {
     carrier:      r.carrier,
     mode:         'trucking',
@@ -500,14 +504,14 @@ async function sbSaveRate(r) {
     dest_zip:     r.destZip     || null,
     rate:         r.lineHaul,
     currency:     r.currency,
+    unit:         'per lane',
     fuel:         r.fuel        || 'INCL',
     date_issued:  r.dateIssued  || null,
     valid_until:  r.validUntil  || null,
-    email:        r.carrierEmail|| '',
     phone:        r.carrierPhone|| '',
     requested_by: r.requestedBy || '',
     accessorials: JSON.stringify(r.accessorials || []),
-    notes:        '',
+    notes:        contactNote,
   };
   if (r.id && !String(r.id).match(/^r\d/)) {
     await sbUpdate('rates', r.id, row);
