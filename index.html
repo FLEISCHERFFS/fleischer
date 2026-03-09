@@ -1196,47 +1196,81 @@ async function importTruckerRates(input){
     } else if(file.name.endsWith('.xlsx')){
       const buf=await file.arrayBuffer();
       const wb=XLSX.read(buf,{type:'array',cellDates:true});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-      // Map Excel columns to our rate shape
-      // Expected columns (case-insensitive): Carrier, Origin, Destination, Rate, Currency, Fuel, ValidUntil/Valid Until, DateIssued/Date Issued, Phone, Email, RequestedBy, Accessorials
+      // Use RATES sheet if present, otherwise first sheet
+      const sheetName=wb.SheetNames.includes('RATES')?'RATES':wb.SheetNames[0];
+      const ws=wb.Sheets[sheetName];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+
       importedRates=rows.map(row=>{
-        const get=(keys)=>{
-          for(const k of keys){
-            const found=Object.keys(row).find(rk=>rk.toLowerCase().replace(/\s/g,'')===k.toLowerCase().replace(/\s/g,''));
-            if(found&&row[found]!==''&&row[found]!==null&&row[found]!==undefined)return String(row[found]).trim();
-          }
-          return '';
+        const col=name=>{
+          const v=row[name];
+          if(v===null||v===undefined||v==='')return'';
+          return String(v).trim();
         };
-        // Parse accessorials — could be JSON string or pipe-separated
-        let accessorials=[];
-        const accRaw=get(['accessorials','accessorial','extras']);
-        if(accRaw){
-          try{accessorials=JSON.parse(accRaw);}
-          catch(e){
-            accessorials=accRaw.split(/[|;,]/).filter(Boolean).map(s=>{
-              const m=s.match(/^(.+?)\s+\$?([\d.]+)$/);
-              return m?{description:m[1].trim(),amount:parseFloat(m[2]),currency:'USD'}:{description:s.trim(),amount:0,currency:'USD'};
-            });
-          }
+
+        // Build accessorials from dedicated cost columns
+        const accessorials=[];
+        const chassisCost=parseFloat(col('Chassis Cost'));
+        if(chassisCost>0)accessorials.push({description:'Chassis',amount:chassisCost,currency:'USD'});
+        const prepullCost=parseFloat(col('Prepull Cost'));
+        if(prepullCost>0)accessorials.push({description:'Pre-pull',amount:prepullCost,currency:'USD'});
+        const dropFee=parseFloat(col('Drop Fee'));
+        if(dropFee>0)accessorials.push({description:'Drop Fee',amount:dropFee,currency:'USD'});
+        const portFees=col('Port Fees');
+        if(portFees&&portFees!=='0'&&!/paid by ffs|included|na/i.test(portFees)){
+          const pf=parseFloat(portFees);
+          if(pf>0)accessorials.push({description:'Port Fees',amount:pf,currency:'USD'});
         }
+        // Freetext accessorials column — split on comma, extract amounts
+        const accNotes=col('Accessorial and Notes');
+        if(accNotes&&!/^(na|n\/a|included)$/i.test(accNotes)){
+          accNotes.split(/,|;/).forEach(s=>{
+            s=s.trim(); if(!s)return;
+            const mHr=s.match(/\$?([\d.]+)\s*\/\s*hr/i);
+            const mFlat=s.match(/\$?([\d.]+)$/);
+            if(mHr) accessorials.push({description:s,amount:parseFloat(mHr[1]),currency:'USD'});
+            else if(mFlat) accessorials.push({description:s.replace(/\$?[\d.]+$/,'').trim(),amount:parseFloat(mFlat[1]),currency:'USD'});
+            else if(s.length>2&&!/free|included/i.test(s)) accessorials.push({description:s,amount:0,currency:'USD'});
+          });
+        }
+
+        // Fuel
+        const fuelIncluded=col('Is Fuel Included?').toLowerCase();
+        const fuelRate=col('Fuel Rate');
+        let fuel='INCL';
+        if(fuelIncluded==='no'||fuelIncluded==='n'){
+          fuel=parseFloat(fuelRate)||fuelRate||'INCL';
+        }
+
+        // Date issued
+        const rawDate=col('Date of Rate Confirmation');
+        let dateIssued='';
+        if(rawDate){const d=new Date(rawDate);if(!isNaN(d))dateIssued=d.toISOString().split('T')[0];}
+
+        // Carrier emails — DO email primary, quote email secondary
+        const carrierEmail=col('Main Email Contact For DO')||col('Main Email Contact for Quotes');
+
+        // Dest ZIP — strip non-numeric, keep 5 digits
+        const rawZip=col('Destination Zip');
+        const destZip=rawZip.replace(/[^0-9]/g,'').slice(0,5);
+
         return{
-          carrier:     get(['carrier','trucker','company','name']),
-          carrierEmail:get(['email','carrieremail','contactemail']),
-          carrierPhone:get(['phone','tel','telephone','carrierphone']),
-          origin:      get(['origin','pickup','from']),
-          originZip:   get(['originzip','origin_zip','pickupzip','fromzip']),
-          dest:        get(['destination','dest','delivery','to']),
-          destZip:     get(['destzip','dest_zip','deliveryzip','tozip']),
-          lineHaul:    parseFloat(get(['linehaul','line_haul','rate','amount','linehaulrate']))||0,
-          currency:    get(['currency'])||'USD',
-          fuel:        get(['fuel','fuelsurcharge','fuel_surcharge'])||'INCL',
-          dateIssued:  get(['dateissued','date_issued','issued','quotedate']),
-          validUntil:  get(['validuntil','valid_until','expiry','expires','expirydate']),
-          requestedBy: get(['requestedby','requested_by','requestedby','employee']),
+          carrier:     col('Trucker Name'),
+          carrierEmail,
+          carrierPhone:'',
+          origin:      col('Origin Port'),
+          originZip:   '',
+          dest:        col('Destination City Name'),
+          destZip,
+          lineHaul:    parseFloat(col('Line Haul Cost (Rate from Trucker)'))||0,
+          currency:    'USD',
+          fuel,
+          dateIssued,
+          validUntil:  '',
+          requestedBy: '',
           accessorials,
         };
-      }).filter(r=>r.carrier&&(r.origin||r.dest));
+      }).filter(r=>r.carrier&&r.carrier.length>1);
     } else {
       statusEl.textContent='❌ Unsupported file type. Use .xlsx or .json';
       return;
@@ -1321,3 +1355,4 @@ document.addEventListener('DOMContentLoaded',async()=>{
 </script>
 </body>
 </html>
+
