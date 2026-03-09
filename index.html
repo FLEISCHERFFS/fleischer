@@ -1229,7 +1229,7 @@ async function importTruckerRates(input){
             const mHr=s.match(/\$?([\d.]+)\s*\/\s*hr/i);
             const mFlat=s.match(/\$?([\d.]+)$/);
             if(mHr) accessorials.push({description:s,amount:parseFloat(mHr[1]),currency:'USD'});
-            else if(mFlat) accessorials.push({description:s.replace(/\$?[\d.]+$/,'').trim(),amount:parseFloat(mFlat[1]),currency:'USD'});
+            else if(mFlat&&parseFloat(mFlat[1])>0) accessorials.push({description:s.replace(/\$?[\d.]+$/,'').trim(),amount:parseFloat(mFlat[1]),currency:'USD'});
             else if(s.length>2&&!/free|included/i.test(s)) accessorials.push({description:s,amount:0,currency:'USD'});
           });
         }
@@ -1262,7 +1262,13 @@ async function importTruckerRates(input){
           originZip:   '',
           dest:        col('Destination City Name'),
           destZip,
-          lineHaul:    parseFloat(col('Line Haul Cost (Rate from Trucker)'))||0,
+          lineHaul:    (()=>{
+            const raw=col('Line Haul Cost (Rate from Trucker)');
+            if(!raw||/^n\/a$/i.test(raw))return 0;
+            // Handle text like "BNSF DALLAS: $1,360.00"
+            const m=raw.match(/\$?([\d,]+(?:\.\d+)?)/);
+            return m?parseFloat(m[1].replace(/,/g,'')):0;
+          })(),
           currency:    'USD',
           fuel,
           dateIssued,
@@ -1270,7 +1276,7 @@ async function importTruckerRates(input){
           requestedBy: '',
           accessorials,
         };
-      }).filter(r=>r.carrier&&r.carrier.length>1);
+      }).filter(r=>r.carrier&&r.carrier.length>1&&(r.lineHaul>0||r.dest));
     } else {
       statusEl.textContent='❌ Unsupported file type. Use .xlsx or .json';
       return;
