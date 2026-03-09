@@ -387,6 +387,7 @@ function showPage(id) {
                 ⬆ Upload .xlsx or .json
                 <input type="file" accept=".xlsx,.json" style="display:none" onchange="importTruckerRates(this)">
               </label>
+              <button class="btn btn-danger" onclick="clearAllRates()">🗑 Clear All Rates</button>
             </div>
             <div id="rates-import-status" style="font-size:12px;color:rgba(255,255,255,.5);margin-top:12px;line-height:1.6"></div>
           </div>
@@ -1172,6 +1173,26 @@ function importCredentials(input){
 }
 
 // ═══════════════════════════════════════════════════════
+// CLEAR ALL RATES
+// ═══════════════════════════════════════════════════════
+async function clearAllRates(){
+  if(!confirm(`Delete all ${db.rates.length} rates? This cannot be undone.`))return;
+  const statusEl=document.getElementById('rates-import-status');
+  statusEl.textContent='⏳ Deleting…';
+  let deleted=0,errors=0;
+  for(const r of [...db.rates]){
+    try{await sbDeleteRate(r.id);deleted++;}catch(e){errors++;console.error(e);}
+  }
+  db.rates=[];
+  db.rateCounter=1;
+  saveDB();
+  closeDetailPanel();
+  renderRates();
+  statusEl.textContent=`🗑 ${deleted} rate${deleted!==1?'s':''} deleted${errors?` (${errors} DB errors — check console)`:''}`;
+  toast(`All rates cleared`,'success');
+}
+
+// ═══════════════════════════════════════════════════════
 // IMPORT TRUCKER RATES (Excel or JSON)
 // Duplicate rule: same carrier + origin + dest → keep newer date
 // ═══════════════════════════════════════════════════════
@@ -1199,30 +1220,32 @@ async function importTruckerRates(input){
       // Use RATES sheet if present, otherwise first sheet
       const sheetName=wb.SheetNames.includes('RATES')?'RATES':wb.SheetNames[0];
       const ws=wb.Sheets[sheetName];
-      const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:true});
 
       importedRates=rows.map(row=>{
         const col=name=>{
           const v=row[name];
           if(v===null||v===undefined||v==='')return'';
+          if(typeof v==='number')return v;  // keep numbers as numbers
           return String(v).trim();
         };
+        const colStr=name=>{const v=col(name);return String(v).trim();};
 
         // Build accessorials from dedicated cost columns
         const accessorials=[];
-        const chassisCost=parseFloat(col('Chassis Cost'));
+        const chassisCost=typeof col('Chassis Cost')==='number'?col('Chassis Cost'):parseFloat(col('Chassis Cost'));
         if(chassisCost>0)accessorials.push({description:'Chassis',amount:chassisCost,currency:'USD'});
-        const prepullCost=parseFloat(col('Prepull Cost'));
+        const prepullCost=typeof col('Prepull Cost')==='number'?col('Prepull Cost'):parseFloat(col('Prepull Cost'));
         if(prepullCost>0)accessorials.push({description:'Pre-pull',amount:prepullCost,currency:'USD'});
-        const dropFee=parseFloat(col('Drop Fee'));
+        const dropFee=typeof col('Drop Fee')==='number'?col('Drop Fee'):parseFloat(col('Drop Fee'));
         if(dropFee>0)accessorials.push({description:'Drop Fee',amount:dropFee,currency:'USD'});
-        const portFees=col('Port Fees');
-        if(portFees&&portFees!=='0'&&!/paid by ffs|included|na/i.test(portFees)){
-          const pf=parseFloat(portFees);
+        const portFeesRaw=col('Port Fees');
+        if(portFeesRaw&&!/paid by ffs|included|na/i.test(String(portFeesRaw))){
+          const pf=typeof portFeesRaw==='number'?portFeesRaw:parseFloat(portFeesRaw);
           if(pf>0)accessorials.push({description:'Port Fees',amount:pf,currency:'USD'});
         }
-        // Freetext accessorials column — split on comma, extract amounts
-        const accNotes=col('Accessorial and Notes');
+        // Freetext accessorials column
+        const accNotes=colStr('Accessorial and Notes');
         if(accNotes&&!/^(na|n\/a|included)$/i.test(accNotes)){
           accNotes.split(/,|;/).forEach(s=>{
             s=s.trim(); if(!s)return;
@@ -1235,38 +1258,48 @@ async function importTruckerRates(input){
         }
 
         // Fuel
-        const fuelIncluded=col('Is Fuel Included?').toLowerCase();
-        const fuelRate=col('Fuel Rate');
+        const fuelIncluded=colStr('Is Fuel Included?').toLowerCase();
+        const fuelRateRaw=col('Fuel Rate');
         let fuel='INCL';
         if(fuelIncluded==='no'||fuelIncluded==='n'){
-          fuel=parseFloat(fuelRate)||fuelRate||'INCL';
+          fuel=typeof fuelRateRaw==='number'?fuelRateRaw:(parseFloat(fuelRateRaw)||'INCL');
         }
 
         // Date issued
         const rawDate=col('Date of Rate Confirmation');
         let dateIssued='';
-        if(rawDate){const d=new Date(rawDate);if(!isNaN(d))dateIssued=d.toISOString().split('T')[0];}
+        if(rawDate){
+          // SheetJS with raw:true returns date serial numbers for dates
+          if(typeof rawDate==='number'){
+            const d=XLSX.SSF.parse_date_code(rawDate);
+            if(d)dateIssued=`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+          } else {
+            const d=new Date(rawDate);if(!isNaN(d))dateIssued=d.toISOString().split('T')[0];
+          }
+        }
 
-        // Carrier emails — DO email primary, quote email secondary
-        const carrierEmail=col('Main Email Contact For DO')||col('Main Email Contact for Quotes');
-
-        // Dest ZIP — strip non-numeric, keep 5 digits
-        const rawZip=col('Destination Zip');
+        // Carrier emails
+        const carrierEmail=colStr('Main Email Contact For DO')||colStr('Main Email Contact for Quotes');
+        // Dest ZIP
+        const rawZip=colStr('Destination Zip');
         const destZip=rawZip.replace(/[^0-9]/g,'').slice(0,5);
 
         return{
-          carrier:     col('Trucker Name'),
+          carrier:     colStr('Trucker Name'),
           carrierEmail,
           carrierPhone:'',
-          origin:      col('Origin Port'),
+          origin:      colStr('Origin Port'),
           originZip:   '',
-          dest:        col('Destination City Name'),
+          dest:        colStr('Destination City Name'),
           destZip,
           lineHaul:    (()=>{
             const raw=col('Line Haul Cost (Rate from Trucker)');
-            if(!raw||/^n\/a$/i.test(raw))return 0;
+            if(raw===''||raw===null)return 0;
+            if(typeof raw==='number')return raw;
+            const s=String(raw);
+            if(/^n\/a$/i.test(s))return 0;
             // Handle text like "BNSF DALLAS: $1,360.00"
-            const m=raw.match(/\$?([\d,]+(?:\.\d+)?)/);
+            const m=s.match(/\$?([\d,]+(?:\.\d+)?)/);
             return m?parseFloat(m[1].replace(/,/g,'')):0;
           })(),
           currency:    'USD',
