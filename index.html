@@ -12,7 +12,7 @@ window.parseMsgFile = function(arrayBuffer) {
   try {
     const bytes = new Uint8Array(arrayBuffer);
     const view  = new DataView(arrayBuffer);
-    const runs  = []; let run = '';
+    const runs  = []; let run = '';h
     for (let i = 0; i < Math.min(bytes.length-1,800000); i+=2) {
       const code = view.getUint16(i,true);
       if (code>=32&&code<=126){run+=String.fromCharCode(code);}
@@ -575,7 +575,7 @@ const PORT_LOOKUP = {
   'union pacific':      {name:'Union Pacific Intermodal',city:'Los Angeles, CA',  zip:'90023', code:'UP-LA',    lat:34.020, lng:-118.179},
   'csx':                {name:'CSX Intermodal',         city:'Baltimore, MD',     zip:'21224', code:'CSX-BAL',  lat:39.280, lng:-76.560},
   'ns':                 {name:'Norfolk Southern Intermodal',city:'Atlanta, GA',   zip:'30354', code:'NS-ATL',   lat:33.647, lng:-84.426},
-  'cn':                 {name:'CN Intermodal',          city:'Chicago, IL',       zip:'60633', code:'CN-CHI',   lat:41.683, lng:-87.560},
+  'cn':                 {name:'CN Intermodal',          city:'Chicago, IL',       zip:'60633', code:'CN-CHI',   lat:41.683, lng:-87.560},  'phoenix':{name:'Phoenix/Tucson Intermodal',city:'Phoenix, AZ',zip:'85034',code:'PHX',lat:33.448,lng:-112.074},  'phoenix/tucson':{name:'Phoenix/Tucson Intermodal',city:'Phoenix, AZ',zip:'85034',code:'PHX',lat:33.448,lng:-112.074},  'tucson':{name:'Phoenix/Tucson Intermodal',city:'Phoenix, AZ',zip:'85034',code:'PHX',lat:33.448,lng:-112.074},
 };
 
 // City ambiguity DB — cities that exist in multiple US states
@@ -602,7 +602,7 @@ const DRAYAGE_PORT_CODES = {
   'seattle':'SEA','tacoma':'TAC','portland':'PDX','new york':'NYC','newark':'NYC',
   'ny/nj':'NYC','baltimore':'BAL','savannah':'SAV','charleston':'CHS','norfolk':'ORF',
   'virginia':'ORF','miami':'MIA','everglades':'FLL','boston':'BOS','philadelphia':'PHL',
-  'houston':'HOU','new orleans':'MSY',
+  'houston':'HOU','new orleans':'MSY','phoenix':'PHX','phoenix/tucson':'PHX','tucson':'PHX',
 };
 
 // ═══════════════════════════════════════════════════
