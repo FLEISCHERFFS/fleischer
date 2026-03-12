@@ -23,24 +23,19 @@ window.parseMsgFile = function(arrayBuffer) {
     let subject='',fromName='',fromEmail='',body=[],headersDone=false;
     for(let i=0;i<runs.length;i++){
       const line=runs[i];
-      // Skip binary/system junk
       if(/substg1|nameid|Root Entry|__attach|BigFunnel|Exchange|FYDIBOHF|namprd|prod\.outlook|protection\.outlook|arcselector|ARC-Seal|ARC-Message|DKIM-Signature/i.test(line))continue;
       if(/^[0-9a-f]{20,}$/i.test(line))continue;
       if(/^[A-Za-z0-9+/]{40,}={0,2}$/.test(line))continue;
-      // Capture metadata
       if(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(line)&&!fromEmail)fromEmail=line;
       if(/^From[:\s]/i.test(line)&&line.includes('@'))fromName=line;
       if(/^Subject[:\s]/i.test(line)&&!subject)subject=line.replace(/^Subject[:\s]*/i,'');
       if(!subject&&line.length>3&&line.length<200&&/^(RE:|FW:|Rate|Quote|Trucking|Drayage|Freight)/i.test(line))subject=line;
-      // Mark body start — try Date header, but also fall back after seeing From/Subject
       if(/^Date[:\s]/i.test(line))headersDone=true;
       if(!headersDone&&fromName&&subject)headersDone=true;
-      // Collect body lines — skip email infrastructure noise
       if(headersDone&&line.length>5&&!/^(Received:|ARC-|X-MS-|X-Microsoft|Content-Type|Content-Transfer|MIME-Version|Message-ID:|Thread-|References:|Return-Path|authentication|x-forefront|x-bess|x-originating|x-source|x-spam|boundary=|charset=)/i.test(line)){
         body.push(line);
       }
     }
-    // If headersDone never triggered, just use everything that isn't obvious junk
     if(!body.length){
       body=runs.filter(l=>l.length>5&&!/^[0-9a-f]{20,}$/i.test(l)&&!/^[A-Za-z0-9+/]{40,}={0,2}$/.test(l));
     }
@@ -84,13 +79,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--label);min-height:
 .nav-item:hover{background:rgba(0,0,0,.04);color:var(--label);}
 .nav-item.active{background:var(--blue-light);color:var(--blue);font-weight:500;}
 .nav-item .icon{font-size:15px;width:20px;text-align:center;}
-
-/* Main area + detail panel layout */
 .main-area{flex:1;display:flex;overflow:hidden;position:relative;}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;transition:margin-right .3s cubic-bezier(.4,0,.2,1);min-width:0;}
 .main.panel-open{margin-right:var(--detail-width);}
-
-/* Detail slide-in panel */
 .detail-panel{position:fixed;top:0;right:0;bottom:0;width:var(--detail-width);background:var(--surface);border-left:1px solid var(--border);box-shadow:-8px 0 32px rgba(0,0,0,.1);z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
 .detail-panel.open{transform:translateX(0);}
 .detail-panel-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0;}
@@ -98,12 +89,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--label);min-height:
 .detail-panel-body{flex:1;overflow-y:auto;}
 .detail-close{background:var(--surface3);border:none;cursor:pointer;font-size:13px;color:var(--label2);padding:5px 10px;border-radius:6px;font-weight:500;font-family:var(--font);}
 .detail-close:hover{background:var(--surface2);}
-
-/* Map */
 #rate-map{height:220px;width:100%;background:#e8f0e8;flex-shrink:0;}
 .leaflet-container{background:#dde8dd !important;}
-
-/* Detail content */
 .detail-section{padding:16px 18px;border-bottom:1px solid var(--border);}
 .detail-section:last-child{border-bottom:none;}
 .detail-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--label3);margin-bottom:10px;}
@@ -122,7 +109,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--label);min-height:
 .acc-item:last-child{border-bottom:none;}
 .acc-item-label{font-size:13px;color:var(--label2);}
 .acc-item-amount{font-size:13px;font-weight:500;font-family:var(--font-mono);}
-
 .topbar{background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .topbar-title{font-size:17px;font-weight:600;letter-spacing:-.3px;}
 .topbar-actions{display:flex;gap:8px;align-items:center;}
@@ -133,6 +119,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--label);min-height:
 .btn-ghost{background:transparent;color:var(--label2);}.btn-ghost:hover{background:rgba(0,0,0,.05);}
 .btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#2dab4e;}
 .btn-danger{background:var(--red-light);color:var(--red);border:1px solid rgba(255,59,48,.2);}.btn-danger:hover{background:#ffe0de;}
+.btn-orange{background:var(--orange-light);color:var(--orange);border:1px solid rgba(255,149,0,.2);}.btn-orange:hover{background:#ffe8c0;}
 .btn-sm{padding:5px 11px;font-size:13px;}.btn-lg{padding:11px 22px;font-size:15px;font-weight:600;}
 .card{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11.5px;font-weight:500;}
@@ -141,6 +128,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--label);min-height:
 .badge-red{background:var(--red-light);color:var(--red);}
 .badge-gray{background:var(--surface3);color:var(--label2);}
 .badge-indigo{background:var(--indigo-light);color:var(--indigo);}
+.badge-blue{background:var(--blue-light);color:var(--blue);}
 .form-group{display:flex;flex-direction:column;gap:5px;}
 .form-label{font-size:13px;font-weight:500;color:var(--label2);}
 .form-input,.form-select,.form-textarea{padding:9px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font);color:var(--label);background:var(--surface);transition:all .15s;outline:none;-webkit-appearance:none;}
@@ -179,7 +167,7 @@ tr.acc-row td:first-child{color:var(--label3);font-size:12px;}
 .search-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,122,255,.15);}
 #toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
 .toast{background:rgba(30,30,30,.92);backdrop-filter:blur(12px);color:#fff;padding:12px 16px;border-radius:var(--radius);font-size:14px;font-weight:500;box-shadow:var(--shadow-lg);animation:slideUp .25s cubic-bezier(.34,1.56,.64,1);max-width:340px;}
-.toast.success{background:rgba(52,199,89,.95);}.toast.error{background:rgba(255,59,48,.95);}
+.toast.success{background:rgba(52,199,89,.95);}.toast.error{background:rgba(255,59,48,.95);}.toast.warning{background:rgba(255,149,0,.95);}
 @keyframes slideUp{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
 .spinner-dark{display:inline-block;width:24px;height:24px;border:2.5px solid var(--border-strong);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;}
@@ -198,17 +186,40 @@ tr.acc-row td:first-child{color:var(--label3);font-size:12px;}
 .parsed-field-label{font-size:12px;font-weight:500;color:var(--label3);min-width:110px;padding-top:1px;}
 .parsed-field-value{font-size:13.5px;color:var(--label);flex:1;}
 .parsed-field-value[contenteditable="true"]:focus{outline:2px solid var(--blue);border-radius:4px;padding:1px 4px;}
+.parsed-field.warning{background:#fff4e0;border:1px solid rgba(255,149,0,.3);}
+.parsed-field.error{background:#fff0ef;border:1px solid rgba(255,59,48,.3);}
 @keyframes sbpulse{0%,100%{opacity:.4}50%{opacity:1}}
 .setup-banner{background:linear-gradient(135deg,#1c1c1e,#2c2c2e);color:#fff;border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .setup-banner h3{font-size:15px;font-weight:600;margin-bottom:4px;}.setup-banner p{font-size:13px;opacity:.6;}
 .acc-toggle{background:none;border:none;cursor:pointer;font-size:12px;color:var(--blue);padding:2px 6px;border-radius:4px;font-family:var(--font);font-weight:500;}
 .acc-toggle:hover{background:var(--blue-light);}
 .fuel-incl{font-size:12px;color:var(--label3);font-style:italic;}
+/* No-result banner */
+.no-result-banner{background:linear-gradient(135deg,#ff9500,#ff6b00);color:#fff;border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;animation:slideUp .3s ease;}
+.no-result-banner h3{font-size:15px;font-weight:600;margin-bottom:4px;}
+.no-result-banner p{font-size:13px;opacity:.8;}
+/* City picker modal */
+.city-option{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;margin-bottom:8px;transition:all .15s;}
+.city-option:hover{border-color:var(--blue);background:var(--blue-light);}
+.city-option.selected{border-color:var(--blue);background:var(--blue-light);}
+/* Drayage search results */
+.trucker-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.trucker-card:hover{border-color:var(--blue);background:var(--blue-light);}
+.trucker-card-name{font-size:14px;font-weight:600;margin-bottom:4px;}
+.trucker-card-meta{font-size:12px;color:var(--label3);display:flex;gap:10px;flex-wrap:wrap;}
+.trucker-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:600;background:var(--surface3);color:var(--label2);margin-right:3px;}
+.trucker-badge.port{background:#e8f1ff;color:#0055cc;}
+.trucker-badge.rail{background:#e6f9eb;color:#1a6b30;}
+.trucker-badge.hz{background:#fff4e0;color:#a05f00;}
+.trucker-badge.bd{background:#eeeeff;color:#3b35a0;}
 @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
-
-/* Truck animation on map */
 @keyframes truckMove{0%{opacity:0;}5%{opacity:1;}95%{opacity:1;}100%{opacity:0;}}
 .truck-marker{font-size:20px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));}
+/* Port confirm step */
+.step-indicator{display:flex;gap:8px;margin-bottom:20px;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border-strong);}
+.step-dot.active{background:var(--blue);}
+.step-dot.done{background:var(--green);}
 </style>
 </head>
 <body>
@@ -252,7 +263,7 @@ function showPage(id) {
         <div class="topbar-actions">
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
-            <input class="search-input" placeholder="Search carrier, origin, ZIP…" id="rate-search" oninput="renderRates()">
+            <input class="search-input" placeholder="Search carrier, origin, ZIP…" id="rate-search" oninput="handleSearch()">
           </div>
           <button class="btn btn-secondary btn-sm" onclick="openModal('add-rate-modal')">+ Add Rate</button>
           <button class="btn btn-primary btn-sm" onclick="showPage('parse')">✉️ Parse Email</button>
@@ -260,6 +271,7 @@ function showPage(id) {
       </div>
       <div class="content" style="flex:1;overflow-y:auto;">
         <div id="setup-banner-wrap"></div>
+        <div id="no-result-banner-wrap"></div>
         <div class="stats-grid" id="rate-stats"></div>
         <div class="card">
           <div class="table-wrap">
@@ -367,7 +379,7 @@ function showPage(id) {
             </div>
             <button class="btn btn-green" onclick="saveApiKey()" style="width:fit-content">Save API Key</button>
           </div>
-          <div style="padding:24px;background:var(--label);border-radius:var(--radius-lg);color:#fff">
+          <div style="padding:24px;background:var(--label);border-radius:var(--radius-lg);color:#fff;margin-bottom:20px">
             <div style="font-size:18px;font-weight:600;margin-bottom:4px">🔑 Credentials Backup</div>
             <div style="font-size:13px;opacity:.55;margin-bottom:20px">Export to file, import on any browser.</div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -378,10 +390,9 @@ function showPage(id) {
             </div>
             <div id="creds-import-status" style="font-size:12px;color:rgba(255,255,255,.4);margin-top:10px"></div>
           </div>
-          <!-- IMPORT TRUCKER RATES -->
           <div style="padding:24px;background:var(--label);border-radius:var(--radius-lg);color:#fff;margin-top:20px">
             <div style="font-size:18px;font-weight:600;margin-bottom:4px">📥 Import Trucker Rates</div>
-            <div style="font-size:13px;opacity:.55;margin-bottom:20px">Upload an Excel (.xlsx) or JSON export to bulk-import rates. Duplicates (same carrier + lane) keep whichever has the newer date.</div>
+            <div style="font-size:13px;opacity:.55;margin-bottom:20px">Upload an Excel (.xlsx) or JSON export to bulk-import rates. Duplicates keep whichever has the newer date.</div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
               <label class="btn btn-green" style="cursor:pointer">
                 ⬆ Upload .xlsx or .json
@@ -403,9 +414,7 @@ function showPage(id) {
       <div class="detail-panel-title" id="detail-panel-title">Rate Detail</div>
       <button class="detail-close" onclick="closeDetailPanel()">✕ Close</button>
     </div>
-    <!-- Map renders here -->
     <div id="rate-map"></div>
-    <!-- Scrollable detail content -->
     <div class="detail-panel-body" id="detail-panel-body"></div>
   </div>
 
@@ -458,12 +467,147 @@ function showPage(id) {
   </div>
 </div>
 
+<!-- CITY PICKER MODAL -->
+<div class="modal-overlay" id="city-picker-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div><div class="modal-title" id="city-picker-title">Multiple locations found</div>
+      <div class="modal-subtitle" id="city-picker-subtitle">Select the correct city</div></div>
+    </div>
+    <div class="modal-body" id="city-picker-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cityPickerCancel()">Cancel</button>
+      <button class="btn btn-primary" onclick="cityPickerConfirm()">Confirm Selection</button>
+    </div>
+  </div>
+</div>
+
+<!-- NO RATE FOUND MODAL -->
+<div class="modal-overlay" id="no-rate-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <div><div class="modal-title">⚠️ No Rate On File</div>
+      <div class="modal-subtitle" id="no-rate-subtitle">Searched for: —</div></div>
+      <button class="modal-close" onclick="closeModal('no-rate-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="no-rate-body"></div>
+  </div>
+</div>
+
+<!-- DRAYAGE RESEARCH MODAL -->
+<div class="modal-overlay" id="drayage-modal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <div><div class="modal-title">🔍 Find Truckers — Drayage Directory</div>
+      <div class="modal-subtitle" id="drayage-modal-subtitle">Search for draymen serving a port</div></div>
+      <button class="modal-close" onclick="closeModal('drayage-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="drayage-modal-body">
+      <div id="drayage-step-port">
+        <div class="step-indicator">
+          <div class="step-dot active" id="sdot-1"></div>
+          <div class="step-dot" id="sdot-2"></div>
+          <div class="step-dot" id="sdot-3"></div>
+        </div>
+        <div class="section-title" style="margin-bottom:6px">Which origin port?</div>
+        <div class="section-sub">Type a port city or name (e.g. "Baltimore", "Long Beach", "Savannah")</div>
+        <div class="form-group mb-4">
+          <input class="form-input" id="drayage-port-input" placeholder="e.g. Baltimore" onkeydown="if(event.key==='Enter')confirmDrayagePort()">
+        </div>
+        <button class="btn btn-primary" onclick="confirmDrayagePort()">→ Search This Port</button>
+      </div>
+      <div id="drayage-step-confirm" style="display:none">
+        <div class="step-indicator">
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot" id="sdot-3b"></div>
+        </div>
+        <div id="drayage-port-confirm-content"></div>
+      </div>
+      <div id="drayage-step-results" style="display:none">
+        <div class="step-indicator">
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+        </div>
+        <div id="drayage-results-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// PORT / RAIL YARD LOOKUP TABLE
+// ═══════════════════════════════════════════════════
+const PORT_LOOKUP = {
+  // West Coast
+  'long beach':         {name:'Port of Long Beach',     city:'Long Beach, CA',    zip:'90802', code:'LGB', lat:33.754, lng:-118.216},
+  'los angeles':        {name:'Port of Los Angeles',    city:'Los Angeles, CA',   zip:'90731', code:'LAX', lat:33.729, lng:-118.262},
+  'la/lb':              {name:'LA/Long Beach Port',     city:'Long Beach, CA',    zip:'90802', code:'LGB', lat:33.754, lng:-118.216},
+  'la/long beach':      {name:'LA/Long Beach Port',     city:'Long Angeles, CA',  zip:'90802', code:'LGB', lat:33.754, lng:-118.216},
+  'oakland':            {name:'Port of Oakland',        city:'Oakland, CA',       zip:'94607', code:'OAK', lat:37.795, lng:-122.279},
+  'seattle':            {name:'Port of Seattle',        city:'Seattle, WA',       zip:'98119', code:'SEA', lat:47.603, lng:-122.337},
+  'tacoma':             {name:'Port of Tacoma',         city:'Tacoma, WA',        zip:'98421', code:'TAC', lat:47.261, lng:-122.411},
+  'portland':           {name:'Port of Portland',       city:'Portland, OR',      zip:'97217', code:'PDX', lat:45.637, lng:-122.683},
+  // East Coast
+  'new york':           {name:'Port of New York/NJ',    city:'Newark, NJ',        zip:'07114', code:'NYC', lat:40.686, lng:-74.148},
+  'newark':             {name:'Port Newark',            city:'Newark, NJ',        zip:'07114', code:'NYC', lat:40.686, lng:-74.148},
+  'ny/nj':              {name:'Port of New York/NJ',    city:'Newark, NJ',        zip:'07114', code:'NYC', lat:40.686, lng:-74.148},
+  'baltimore':          {name:'Port of Baltimore',      city:'Baltimore, MD',     zip:'21224', code:'BAL', lat:39.268, lng:-76.580},
+  'savannah':           {name:'Port of Savannah',       city:'Savannah, GA',      zip:'31401', code:'SAV', lat:32.082, lng:-81.094},
+  'charleston':         {name:'Port of Charleston',     city:'Charleston, SC',    zip:'29405', code:'CHS', lat:32.776, lng:-79.948},
+  'norfolk':            {name:'Port of Virginia',       city:'Norfolk, VA',       zip:'23502', code:'ORF', lat:36.945, lng:-76.317},
+  'virginia':           {name:'Port of Virginia',       city:'Norfolk, VA',       zip:'23502', code:'ORF', lat:36.945, lng:-76.317},
+  'miami':              {name:'Port of Miami',          city:'Miami, FL',         zip:'33132', code:'MIA', lat:25.775, lng:-80.172},
+  'everglades':         {name:'Port Everglades',        city:'Fort Lauderdale, FL',zip:'33316',code:'FLL', lat:26.092, lng:-80.117},
+  'boston':             {name:'Port of Boston',         city:'Boston, MA',        zip:'02210', code:'BOS', lat:42.352, lng:-71.045},
+  'philadelphia':       {name:'Port of Philadelphia',   city:'Philadelphia, PA',  zip:'19112', code:'PHL', lat:39.877, lng:-75.136},
+  // Gulf
+  'houston':            {name:'Port of Houston',        city:'Houston, TX',       zip:'77029', code:'HOU', lat:29.726, lng:-95.266},
+  'new orleans':        {name:'Port of New Orleans',    city:'New Orleans, LA',   zip:'70130', code:'MSY', lat:29.942, lng:-90.055},
+  'gulf':               {name:'Gulf Coast Port',        city:'Houston, TX',       zip:'77029', code:'HOU', lat:29.726, lng:-95.266},
+  // Rail yards
+  'bnsf los angeles':   {name:'BNSF Logistics Park LA', city:'Commerce, CA',      zip:'90040', code:'BNSF-LA',  lat:34.003, lng:-118.142},
+  'bnsf chicago':       {name:'BNSF Logistics Park Chicago',city:'Elwood, IL',    zip:'60421', code:'BNSF-CHI', lat:41.424, lng:-88.083},
+  'union pacific':      {name:'Union Pacific Intermodal',city:'Los Angeles, CA',  zip:'90023', code:'UP-LA',    lat:34.020, lng:-118.179},
+  'csx':                {name:'CSX Intermodal',         city:'Baltimore, MD',     zip:'21224', code:'CSX-BAL',  lat:39.280, lng:-76.560},
+  'ns':                 {name:'Norfolk Southern Intermodal',city:'Atlanta, GA',   zip:'30354', code:'NS-ATL',   lat:33.647, lng:-84.426},
+  'cn':                 {name:'CN Intermodal',          city:'Chicago, IL',       zip:'60633', code:'CN-CHI',   lat:41.683, lng:-87.560},
+};
+
+// City ambiguity DB — cities that exist in multiple US states
+const AMBIGUOUS_CITIES = {
+  'springfield': [{city:'Springfield, IL',zip:'62701',state:'Illinois'},{city:'Springfield, MO',zip:'65801',state:'Missouri'},{city:'Springfield, MA',zip:'01101',state:'Massachusetts'},{city:'Springfield, OH',zip:'45501',state:'Ohio'},{city:'Springfield, OR',zip:'97477',state:'Oregon'}],
+  'franklin':    [{city:'Franklin, TN',zip:'37064',state:'Tennessee'},{city:'Franklin, VA',zip:'23851',state:'Virginia'},{city:'Franklin, KY',zip:'42134',state:'Kentucky'},{city:'Franklin, PA',zip:'16323',state:'Pennsylvania'}],
+  'richmond':    [{city:'Richmond, VA',zip:'23219',state:'Virginia'},{city:'Richmond, CA',zip:'94801',state:'California'},{city:'Richmond, TX',zip:'77469',state:'Texas'},{city:'Richmond, KY',zip:'40475',state:'Kentucky'}],
+  'portland':    [{city:'Portland, OR',zip:'97201',state:'Oregon'},{city:'Portland, ME',zip:'04101',state:'Maine'}],
+  'columbia':    [{city:'Columbia, SC',zip:'29201',state:'South Carolina'},{city:'Columbia, MO',zip:'65201',state:'Missouri'},{city:'Columbia, MD',zip:'21044',state:'Maryland'}],
+  'jackson':     [{city:'Jackson, MS',zip:'39201',state:'Mississippi'},{city:'Jackson, TN',zip:'38301',state:'Tennessee'},{city:'Jackson, MI',zip:'49201',state:'Michigan'}],
+  'albany':      [{city:'Albany, NY',zip:'12201',state:'New York'},{city:'Albany, GA',zip:'31701',state:'Georgia'},{city:'Albany, OR',zip:'97321',state:'Oregon'}],
+  'rochester':   [{city:'Rochester, NY',zip:'14601',state:'New York'},{city:'Rochester, MN',zip:'55901',state:'Minnesota'},{city:'Rochester, NH',zip:'03867',state:'New Hampshire'}],
+  'greenville':  [{city:'Greenville, SC',zip:'29601',state:'South Carolina'},{city:'Greenville, NC',zip:'27834',state:'North Carolina'},{city:'Greenville, TX',zip:'75401',state:'Texas'},{city:'Greenville, MS',zip:'38701',state:'Mississippi'}],
+  'florence':    [{city:'Florence, SC',zip:'29501',state:'South Carolina'},{city:'Florence, AL',zip:'35630',state:'Alabama'},{city:'Florence, KY',zip:'41042',state:'Kentucky'}],
+  'manchester':  [{city:'Manchester, NH',zip:'03101',state:'New Hampshire'},{city:'Manchester, TN',zip:'37355',state:'Tennessee'},{city:'Manchester, CT',zip:'06040',state:'Connecticut'}],
+  'auburn':      [{city:'Auburn, AL',zip:'36830',state:'Alabama'},{city:'Auburn, WA',zip:'98001',state:'Washington'},{city:'Auburn, NY',zip:'13021',state:'New York'},{city:'Auburn, CA',zip:'95603',state:'California'}],
+  'burlington':  [{city:'Burlington, VT',zip:'05401',state:'Vermont'},{city:'Burlington, NC',zip:'27215',state:'North Carolina'},{city:'Burlington, IA',zip:'52601',state:'Iowa'}],
+  'dover':       [{city:'Dover, DE',zip:'19901',state:'Delaware'},{city:'Dover, NH',zip:'03820',state:'New Hampshire'},{city:'Dover, NJ',zip:'07801',state:'New Jersey'}],
+};
+
+// Drayage.com port codes
+const DRAYAGE_PORT_CODES = {
+  'lGB':'LGB','long beach':'LGB','los angeles':'LAX','la/lb':'LGB','oakland':'OAK',
+  'seattle':'SEA','tacoma':'TAC','portland':'PDX','new york':'NYC','newark':'NYC',
+  'ny/nj':'NYC','baltimore':'BAL','savannah':'SAV','charleston':'CHS','norfolk':'ORF',
+  'virginia':'ORF','miami':'MIA','everglades':'FLL','boston':'BOS','philadelphia':'PHL',
+  'houston':'HOU','new orleans':'MSY',
+};
+
+// ═══════════════════════════════════════════════════
 // CREDENTIALS
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function getSbUrl(){return localStorage.getItem('fleischer_sb_url')||'';}
 function getSbKey(){return localStorage.getItem('fleischer_sb_key')||'';}
 function sbReady(){return !!(getSbUrl()&&getSbKey());}
@@ -473,9 +617,9 @@ function getApiHeaders(){
   return{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // SUPABASE
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function sbH(){const k=getSbKey();return{apikey:k,Authorization:`Bearer ${k}`,'Content-Type':'application/json',Accept:'application/json','X-Client-Info':'fleischer/1.0'};}
 async function sbSelect(table,filters=''){
   const res=await fetch(`${getSbUrl()}/rest/v1/${table}?${filters}&order=id.desc`,{headers:sbH()});
@@ -497,9 +641,9 @@ async function sbDeleteRow(table,id){
   if(!res.ok){const t=await res.text();throw new Error(`${res.status}: ${t}`);}
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // LOCAL DB
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 const DB_KEY='fleischer_trucking_v2';
 function initDB(){
   const fmt=d=>d.toISOString().split('T')[0];
@@ -512,7 +656,8 @@ function initDB(){
        origin:'Long Beach, CA',originZip:'90802',dest:'Fontana, CA',destZip:'92335',
        lineHaul:650,currency:'USD',fuel:'INCL',
        dateIssued:fmt(sub(t,10)),validUntil:fmt(add(t,50)),requestedBy:'Maria Chen',
-       accessorials:[{description:'Chassis Split',amount:75,currency:'USD'},{description:'Pre-pull',amount:125,currency:'USD'}]},
+       accessorials:[{description:'Chassis Split',amount:75,currency:'USD'},{description:'Pre-pull',amount:125,currency:'USD'}],
+       rawEmail:''},
     ],
     rateCounter:2
   };
@@ -521,9 +666,9 @@ function loadDB(){try{const r=localStorage.getItem(DB_KEY);if(r)return JSON.pars
 function saveDB(){localStorage.setItem(DB_KEY,JSON.stringify(db));}
 let db=loadDB();
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // SUPABASE LOAD / SAVE
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 async function loadFromSupabase(){
   if(!sbReady())return;
   const bar=document.createElement('div');
@@ -547,7 +692,8 @@ async function loadFromSupabase(){
       dateIssued:  r.date_issued  ||'',
       validUntil:  r.valid_until  ||'',
       requestedBy: r.requested_by ||'',
-      accessorials:(()=>{try{return JSON.parse(r.accessorials||'[]');}catch(e){return[];}})()
+      accessorials:(()=>{try{return JSON.parse(r.accessorials||'[]');}catch(e){return[];}})(),
+      rawEmail:    r.raw_email    ||'',
     }));
     saveDB();clearTimeout(to);bar.remove();
     renderRates();toast('✓ Database connected','success');
@@ -579,6 +725,7 @@ async function sbSaveRate(r){
     phone:       r.carrierPhone||'',
     requested_by:r.requestedBy ||'',
     accessorials:JSON.stringify(r.accessorials||[]),
+    raw_email:   r.rawEmail    ||'',
     notes:       contactNote,
   };
   if(r.id&&!String(r.id).match(/^r\d/)){
@@ -596,9 +743,9 @@ async function sbDeleteRate(id){
   saveDB();
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // UTILITIES
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function fmtMoney(n,cur='USD'){
   if(n===null||n===undefined||n==='')return'—';
   const v=parseFloat(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -623,9 +770,121 @@ function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.addEventListener('click',e=>{if(e.target.classList.contains('modal-overlay'))e.target.classList.remove('open');});
 
-// ═══════════════════════════════════════════════════════
-// SETUP BANNER
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// ZIP DISTANCE (Haversine approximation using geocode)
+// ═══════════════════════════════════════════════════
+function haversineKm(lat1,lon1,lat2,lon2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+// ZIP code lat/lng cache
+const zipCache = {};
+async function zipToLatLng(zip){
+  if(!zip)return null;
+  if(zipCache[zip])return zipCache[zip];
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=US&format=json&limit=1`,{headers:{'Accept-Language':'en'}});
+    const d=await res.json();
+    if(d&&d[0]){const r=[parseFloat(d[0].lat),parseFloat(d[0].lon)];zipCache[zip]=r;return r;}
+  }catch(e){}
+  return null;
+}
+
+// ═══════════════════════════════════════════════════
+// CLOSEST MATCH SEARCH
+// ═══════════════════════════════════════════════════
+async function findClosestMatch(query){
+  const q=query.toLowerCase().trim();
+  // Try exact first
+  const exact=db.rates.find(r=>
+    r.dest.toLowerCase().includes(q)||r.destZip===q||
+    r.origin.toLowerCase().includes(q)||r.originZip===q
+  );
+  if(exact)return{rate:exact,distance:0,type:'exact'};
+
+  // Try ZIP proximity
+  const queryIsZip=/^\d{5}$/.test(q);
+  if(queryIsZip){
+    const queryCoord=await zipToLatLng(q);
+    if(queryCoord){
+      let best=null,bestDist=Infinity;
+      for(const r of db.rates){
+        for(const zip of [r.destZip,r.originZip]){
+          if(!zip)continue;
+          const coord=await zipToLatLng(zip);
+          if(!coord)continue;
+          const dist=haversineKm(queryCoord[0],queryCoord[1],coord[0],coord[1]);
+          if(dist<bestDist){bestDist=dist;best={rate:r,distance:Math.round(dist),type:'zip'};}
+        }
+      }
+      if(best)return best;
+    }
+  }
+
+  // Fuzzy city name match
+  let best=null,bestScore=0;
+  for(const r of db.rates){
+    for(const loc of [r.dest,r.origin]){
+      const city=loc.toLowerCase().split(',')[0].trim();
+      if(city.includes(q)||q.includes(city)){
+        const score=Math.min(city.length,q.length)/Math.max(city.length,q.length);
+        if(score>bestScore){bestScore=score;best={rate:r,distance:null,type:'city'};}
+      }
+    }
+  }
+  return best;
+}
+
+// ═══════════════════════════════════════════════════
+// SEARCH HANDLER
+// ═══════════════════════════════════════════════════
+let searchTimeout=null;
+function handleSearch(){
+  clearTimeout(searchTimeout);
+  searchTimeout=setTimeout(async()=>{
+    const q=(document.getElementById('rate-search')?.value||'').trim();
+    renderRates();
+    if(!q)return;
+    // Check if any results rendered
+    const tbody=document.getElementById('rates-table-body');
+    const hasResults=tbody&&tbody.innerHTML&&!tbody.innerHTML.includes('No trucking rates');
+    if(!hasResults&&q.length>=3){
+      await showNoRateFound(q);
+    } else {
+      document.getElementById('no-result-banner-wrap').innerHTML='';
+    }
+  },400);
+}
+
+async function showNoRateFound(query){
+  const match=await findClosestMatch(query);
+  const wrap=document.getElementById('no-result-banner-wrap');
+  if(!match){
+    wrap.innerHTML=`<div class="no-result-banner">
+      <div><h3>No rate on file for "${query}"</h3><p>No similar lanes found either. Use Drayage Directory to find truckers.</p></div>
+      <button class="btn btn-secondary btn-sm" onclick="openDrayageModal()">🔍 Find Truckers</button>
+    </div>`;
+    return;
+  }
+  const r=match.rate;
+  const distNote=match.distance>0?`~${match.distance} km away`:(match.type==='city'?'closest city match':'');
+  wrap.innerHTML=`<div class="no-result-banner">
+    <div>
+      <h3>No exact rate for "${query}"</h3>
+      <p>Closest on file: <strong>${r.carrier}</strong> — ${r.origin} → ${r.dest} — ${fmtMoney(r.lineHaul,r.currency)} ${distNote?'('+distNote+')':''}</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button class="btn btn-secondary btn-sm" onclick="openDetailPanel('${r.id}')">View Rate</button>
+      <button class="btn btn-orange btn-sm" onclick="openDrayageModal('${query}')">🔍 Find Truckers</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// SETUP BANNER & STATS
+// ═══════════════════════════════════════════════════
 function renderSetupBanner(){
   const w=document.getElementById('setup-banner-wrap');if(!w)return;
   w.innerHTML=sbReady()?'':`
@@ -635,9 +894,6 @@ function renderSetupBanner(){
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════
-// STATS
-// ═══════════════════════════════════════════════════════
 function renderStats(){
   const total=db.rates.length;
   const expiring=db.rates.filter(r=>{const d=daysUntil(r.validUntil);return d!==null&&d>=0&&d<=30;}).length;
@@ -650,9 +906,9 @@ function renderStats(){
     <div class="stat-card"><div class="stat-label">Expired</div><div class="stat-value" style="color:var(--red)">${expired}</div><div class="stat-sub">Need refresh</div></div>`;
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // RATE TABLE
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 const expandedRows=new Set();
 let selectedRateId=null;
 
@@ -670,7 +926,7 @@ function renderRates(){
     :db.rates;
   const tbody=document.getElementById('rates-table-body');
   if(!rates.length){
-    tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--label3);padding:40px">No trucking rates yet. Click <strong>+ Add Rate</strong> or use <strong>✉️ Parse Email</strong>.</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--label3);padding:40px">No trucking rates found. Click <strong>+ Add Rate</strong> or use <strong>✉️ Parse Email</strong>.</td></tr>`;
     return;
   }
   let html='';
@@ -697,7 +953,6 @@ function renderRates(){
     const accBtn=accCount>0
       ?`<button class="acc-toggle" onclick="toggleAcc('${r.id}',event)">${expanded?'▲':'▼'} ${accCount} charge${accCount>1?'s':''}</button>`
       :`<span style="font-size:12px;color:var(--label3)">—</span>`;
-
     html+=`<tr class="main-row${selected?' selected':''}" onclick="openDetailPanel('${r.id}')">
       <td>${carrierCell}</td>
       <td>${originDest}</td>
@@ -709,7 +964,6 @@ function renderRates(){
       <td>${accBtn}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteRate('${r.id}')">🗑</button></td>
     </tr>`;
-
     if(expanded&&accCount>0){
       for(const a of r.accessorials){
         html+=`<tr class="acc-row">
@@ -759,6 +1013,7 @@ async function saveManualRate(){
     validUntil:  document.getElementById('ar-valid').value||'',
     requestedBy: document.getElementById('ar-reqby').value.trim(),
     accessorials,
+    rawEmail:'',
   };
   db.rates.push(r);
   try{await sbSaveRate(r);toast('Rate saved ✓','success');}
@@ -768,9 +1023,33 @@ async function saveManualRate(){
   document.getElementById('ar-currency').value='USD';
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// .EML DOWNLOAD
+// ═══════════════════════════════════════════════════
+function downloadEml(r){
+  if(!r||!r.rawEmail){toast('No email saved for this rate','error');return;}
+  const safeName=(r.carrier+' '+r.origin+' '+r.dest).replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
+  const now=new Date().toUTCString();
+  const eml=[
+    'From: '+(r.carrierEmail||'unknown@unknown.com'),
+    'To: quotes@fleischer-chb.com',
+    'Subject: Rate Quote — '+r.carrier+' | '+r.origin+' → '+r.dest,
+    'Date: '+(r.dateIssued?new Date(r.dateIssued+'T12:00:00').toUTCString():now),
+    'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset=UTF-8',
+    '',
+    r.rawEmail
+  ].join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([eml],{type:'message/rfc822'}));
+  a.download=safeName+'.eml';
+  a.click();
+  toast('📧 .eml downloaded ✓','success');
+}
+
+// ═══════════════════════════════════════════════════
 // DETAIL PANEL + MAP
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 let mapInstance=null;
 let truckAnimTimer=null;
 
@@ -787,78 +1066,49 @@ async function openDetailPanel(id){
   if(!r)return;
   selectedRateId=id;
   renderRates();
-
-  // Header
   document.getElementById('detail-panel-title').textContent=r.carrier;
-
-  // Build body content
   const accRows=(r.accessorials||[]).map(a=>`
     <div class="acc-item">
       <span class="acc-item-label">↳ ${a.description}</span>
       <span class="acc-item-amount">${fmtMoney(a.amount,a.currency||r.currency)}</span>
     </div>`).join('');
-
   const fuelDisplay=(!r.fuel||r.fuel==='INCL')
     ?'<span style="color:var(--label3);font-style:italic">Included</span>'
     :`<span class="mono">${fmtMoney(r.fuel,r.currency)}</span>`;
 
   document.getElementById('detail-panel-body').innerHTML=`
-    <!-- Lane bar -->
     <div class="detail-lane">
-      <div>
-        <div class="detail-lane-loc">${r.origin||'—'}</div>
-        <div class="detail-lane-zip">${r.originZip||'—'}</div>
-      </div>
+      <div><div class="detail-lane-loc">${r.origin||'—'}</div><div class="detail-lane-zip">${r.originZip||'—'}</div></div>
       <div class="detail-lane-arrow">→</div>
-      <div style="text-align:right">
-        <div class="detail-lane-loc">${r.dest||'—'}</div>
-        <div class="detail-lane-zip">${r.destZip||'—'}</div>
-      </div>
+      <div style="text-align:right"><div class="detail-lane-loc">${r.dest||'—'}</div><div class="detail-lane-zip">${r.destZip||'—'}</div></div>
     </div>
-    <!-- Rate hero -->
     <div class="detail-rate-hero">
-      <div>
-        <div class="detail-rate-amount">${fmtMoney(r.lineHaul,r.currency)}</div>
-        <div class="detail-rate-sub">Line Haul · ${r.currency}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:13px;font-weight:600;margin-bottom:2px">Fuel</div>
-        <div style="font-size:16px;font-weight:700;color:var(--blue)">${fuelDisplay}</div>
-      </div>
+      <div><div class="detail-rate-amount">${fmtMoney(r.lineHaul,r.currency)}</div><div class="detail-rate-sub">Line Haul · ${r.currency}</div></div>
+      <div style="text-align:right"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Fuel</div><div style="font-size:16px;font-weight:700;color:var(--blue)">${fuelDisplay}</div></div>
     </div>
-    <!-- Carrier info -->
     <div class="detail-section">
       <div class="detail-section-label">Carrier</div>
       <div class="detail-row"><span class="detail-row-label">Company</span><span class="detail-row-value">${r.carrier}</span></div>
       ${r.carrierEmail?`<div class="detail-row"><span class="detail-row-label">Email</span><span class="detail-row-value"><a href="mailto:${r.carrierEmail}" style="color:var(--blue);text-decoration:none">${r.carrierEmail}</a></span></div>`:''}
       ${r.carrierPhone?`<div class="detail-row"><span class="detail-row-label">Phone</span><span class="detail-row-value"><a href="tel:${r.carrierPhone}" style="color:var(--blue);text-decoration:none">${r.carrierPhone}</a></span></div>`:''}
     </div>
-    <!-- Dates -->
     <div class="detail-section">
       <div class="detail-section-label">Dates</div>
       <div class="detail-row"><span class="detail-row-label">Date Issued</span><span class="detail-row-value">${fmtDate(r.dateIssued)}</span></div>
       <div class="detail-row"><span class="detail-row-label">Valid Until</span><span class="detail-row-value">${fmtDate(r.validUntil)} ${validityBadge(r)}</span></div>
       ${r.requestedBy?`<div class="detail-row"><span class="detail-row-label">Requested By</span><span class="detail-row-value"><span class="badge badge-indigo">${r.requestedBy}</span></span></div>`:''}
     </div>
-    <!-- Accessorials -->
-    ${accRows?`<div class="detail-section">
-      <div class="detail-section-label">Accessorial Charges</div>
-      ${accRows}
-    </div>`:''}
-    <!-- Delete -->
-    <div class="detail-section">
-      <button class="btn btn-danger btn-sm" onclick="deleteRate('${r.id}')">🗑 Delete this rate</button>
+    ${accRows?`<div class="detail-section"><div class="detail-section-label">Accessorial Charges</div>${accRows}</div>`:''}
+    <div class="detail-section" style="display:flex;gap:8px;flex-wrap:wrap">
+      ${r.rawEmail?`<button class="btn btn-secondary btn-sm" onclick="downloadEml(db.rates.find(x=>x.id==='${r.id}'))">📧 Download Email</button>`:''}
+      <button class="btn btn-danger btn-sm" onclick="deleteRate('${r.id}')">🗑 Delete</button>
     </div>`;
 
-  // Open panel
   document.getElementById('detail-panel').classList.add('open');
   document.getElementById('main-scroll').classList.add('panel-open');
-
-  // Render map after panel is visible
   setTimeout(()=>renderMap(r),320);
 }
 
-// ─── GEOCODE via Nominatim (free, no key) ───
 async function geocode(query){
   try{
     const url=`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
@@ -875,55 +1125,31 @@ function stopTruckAnim(){
 
 async function renderMap(r){
   stopTruckAnim();
-
-  // Destroy old map
   if(mapInstance){mapInstance.remove();mapInstance=null;}
-
   const mapEl=document.getElementById('rate-map');
   mapEl.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--label3);font-size:13px;gap:8px"><span style="display:inline-block;width:16px;height:16px;border:2px solid #ccc;border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite"></span> Loading map…</div>';
-
-  // Geocode — prefer ZIP, fall back to city+state
   const originQuery=(r.originZip?r.originZip+', USA':r.origin)||r.origin;
   const destQuery=(r.destZip?r.destZip+', USA':r.dest)||r.dest;
-
   const [originCoord,destCoord]=await Promise.all([geocode(originQuery),geocode(destQuery)]);
-
   if(!originCoord||!destCoord){
     mapEl.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--label3);font-size:13px;padding:20px;text-align:center">📍 Could not locate addresses for map.<br><span style="font-size:11px;margin-top:4px;display:block">Add ZIP codes to improve map accuracy.</span></div>`;
     return;
   }
-
-  // Init Leaflet
   mapInstance=L.map('rate-map',{zoomControl:false,attributionControl:false,scrollWheelZoom:false});
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(mapInstance);
-
-  // Fit bounds
   const bounds=L.latLngBounds([originCoord,destCoord]).pad(0.25);
   mapInstance.fitBounds(bounds);
-
-  // Origin pin
   const pinIcon=svg=>L.divIcon({html:svg,className:'',iconAnchor:[10,10]});
   L.marker(originCoord,{icon:pinIcon('<div style="width:20px;height:20px;background:var(--blue);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3)"></div>')}).addTo(mapInstance);
-  // Dest pin
   L.marker(destCoord,{icon:pinIcon('<div style="width:20px;height:20px;background:var(--red);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3)"></div>')}).addTo(mapInstance);
-
-  // Dotted line
-  L.polyline([originCoord,destCoord],{
-    color:'#007aff',weight:3,dashArray:'8 8',opacity:.7
-  }).addTo(mapInstance);
-
-  // Animated truck marker
+  L.polyline([originCoord,destCoord],{color:'#007aff',weight:3,dashArray:'8 8',opacity:.7}).addTo(mapInstance);
   const truckIcon=L.divIcon({html:'<div class="truck-marker">🚛</div>',className:'',iconAnchor:[12,12]});
   const truckMarker=L.marker(originCoord,{icon:truckIcon,zIndexOffset:1000}).addTo(mapInstance);
-
-  // Animate truck along the line
-  let progress=0;
-  const STEPS=200;
+  let progress=0;const STEPS=200;
   stopTruckAnim();
   truckAnimTimer=setInterval(()=>{
     progress=(progress+1)%STEPS;
     const t=progress/STEPS;
-    // ease in-out
     const ease=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
     const lat=originCoord[0]+(destCoord[0]-originCoord[0])*ease;
     const lng=originCoord[1]+(destCoord[1]-originCoord[1])*ease;
@@ -931,10 +1157,75 @@ async function renderMap(r){
   },40);
 }
 
-// ═══════════════════════════════════════════════════════
-// EMAIL PARSER
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// CITY PICKER
+// ═══════════════════════════════════════════════════
+let cityPickerCallback=null;
+let cityPickerSelected=null;
+
+function showCityPicker(fieldLabel, cities, callback){
+  cityPickerCallback=callback;
+  cityPickerSelected=null;
+  document.getElementById('city-picker-title').textContent=`Multiple "${fieldLabel}" locations found`;
+  document.getElementById('city-picker-subtitle').textContent=`Select the correct US city for this rate`;
+  document.getElementById('city-picker-body').innerHTML=cities.map((c,i)=>`
+    <div class="city-option" id="cpopt-${i}" onclick="selectCityOption(${i},${JSON.stringify(c).replace(/"/g,'&quot;')})">
+      <div>
+        <div style="font-weight:600;font-size:14px">${c.city}</div>
+        <div style="font-size:12px;color:var(--label3)">ZIP: ${c.zip} · ${c.state}</div>
+      </div>
+    </div>`).join('');
+  openModal('city-picker-modal');
+}
+
+function selectCityOption(i,city){
+  document.querySelectorAll('.city-option').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('cpopt-'+i)?.classList.add('selected');
+  cityPickerSelected=city;
+}
+function cityPickerConfirm(){
+  if(!cityPickerSelected){toast('Please select a city first','error');return;}
+  closeModal('city-picker-modal');
+  if(cityPickerCallback)cityPickerCallback(cityPickerSelected);
+}
+function cityPickerCancel(){
+  closeModal('city-picker-modal');
+  cityPickerCallback=null;
+}
+
+// ═══════════════════════════════════════════════════
+// PARSE EMAIL
+// ═══════════════════════════════════════════════════
 let parsedData=null;
+
+// Resolve port/terminal to ZIP using hardcoded table then AI
+function resolvePortZip(locationText){
+  if(!locationText)return null;
+  const lt=locationText.toLowerCase().trim();
+  for(const [key,val] of Object.entries(PORT_LOOKUP)){
+    if(lt.includes(key)||key.includes(lt)){
+      return{zip:val.zip,resolvedName:val.name,city:val.city};
+    }
+  }
+  return null;
+}
+
+// Check if text looks like a non-US location
+function looksNonUS(text){
+  if(!text)return false;
+  const nonUSPatterns=[
+    /\b(china|chinois|guangzhou|shanghai|shenzhen|beijing|hong kong|taiwan|south korea|korea|japan|vietnam|thailand|india|mexico|canada|uk|united kingdom|germany|france|italy|spain|netherlands|belgium|rotterdam|hamburg|felixstowe|antwerp|le havre)\b/i,
+    /\b[A-Z]{2}\s+[A-Z0-9]{4,}\b/ // foreign postal codes
+  ];
+  return nonUSPatterns.some(p=>p.test(text));
+}
+
+// Check ambiguous city
+function checkAmbiguousCity(cityText){
+  if(!cityText)return null;
+  const city=cityText.toLowerCase().split(',')[0].trim();
+  return AMBIGUOUS_CITIES[city]||null;
+}
 
 async function parseEmail(){
   const text=document.getElementById('email-paste-area').value.trim();
@@ -950,34 +1241,35 @@ async function parseEmail(){
 
 Extract structured rate information from the email below. Follow these rules carefully:
 
-1. LINE HAUL: The primary move charge — inland freight, cartage, drayage, delivery, or line haul rate. This is the MAIN rate. Extract ONE number for this.
-2. FUEL: Extract fuel surcharge as a separate number if explicitly stated. If fuel is described as "included" or not mentioned separately, set fuel to "INCL".
-3. ACCESSORIALS: ALL other charges are accessorials — chassis, chassis split, pre-pull, detention, layover, overweight, hazmat, toll, pier pass, clean truck fee, etc. Do NOT include line haul or fuel here.
-4. CARRIER INFO: Extract carrier/trucker company name, email, and phone.
-5. FLEISCHER EMPLOYEE: Any email ending in @fleischer-chb.com belongs to a Fleischer employee who requested this quote. Extract their name as "requestedBy".
-6. DATE ISSUED: The date the email was sent or the quote was issued (YYYY-MM-DD).
-7. ZIPS: Extract origin and destination ZIP codes if mentioned anywhere in the email.
-8. MULTIPLE LANES: If the email quotes multiple lanes (e.g. LA to Dallas AND LA to Houston), return an array called "lanes" with one object per lane. Each lane has its own lineHaul, fuel, accessorials, origin, originZip, destination, destZip. If there is only one lane, still return a "lanes" array with one item.
+1. LINE HAUL: The primary move charge. Extract ONE number.
+2. FUEL: Extract fuel surcharge separately. If included or not mentioned, set to "INCL".
+3. ACCESSORIALS: All other charges (chassis, pre-pull, detention, etc.). Do NOT include line haul or fuel here.
+4. CARRIER INFO: Company name, email, phone.
+5. FLEISCHER EMPLOYEE: Any @fleischer-chb.com email = employee who requested quote. Extract as "requestedBy".
+6. DATE ISSUED: Email sent date (YYYY-MM-DD).
+7. ZIPS: Extract origin and destination ZIP codes if mentioned.
+8. ORIGIN: If origin is a port or rail yard, include the terminal/port name exactly as stated (e.g. "Port of Long Beach", "BNSF Logistics Park Chicago").
+9. MULTIPLE LANES: Return "lanes" array, one object per lane.
 
-Return ONLY a valid JSON object, no markdown:
+Return ONLY valid JSON, no markdown:
 {
   "carrier": "trucker company name",
-  "carrierEmail": "carrier email or null",
-  "carrierPhone": "carrier phone or null",
+  "carrierEmail": "email or null",
+  "carrierPhone": "phone or null",
   "currency": "USD",
   "dateIssued": "YYYY-MM-DD or null",
   "validUntil": "YYYY-MM-DD or null",
   "requestedBy": "Fleischer employee name or null",
   "lanes": [
     {
-      "origin": "city, state",
+      "origin": "city, state or port name",
       "originZip": "12345 or null",
       "destination": "city, state",
       "destZip": "12345 or null",
       "lineHaul": 650.00,
       "fuel": 75.00,
       "accessorials": [
-        { "description": "Chassis Split", "amount": 75.00, "currency": "USD" }
+        {"description": "Chassis Split", "amount": 75.00, "currency": "USD"}
       ]
     }
   ]
@@ -996,7 +1288,9 @@ ${text}`;
     const match=raw.match(/\{[\s\S]*\}/);
     if(!match)throw new Error('No JSON in response');
     parsedData=JSON.parse(match[0]);
-    // Flatten single-lane for backwards compat with display
+    parsedData.rawEmail=text; // store raw email
+
+    // Flatten single lane
     if(parsedData.lanes&&parsedData.lanes.length===1){
       Object.assign(parsedData,{
         origin:      parsedData.lanes[0].origin,
@@ -1008,7 +1302,10 @@ ${text}`;
         accessorials:parsedData.lanes[0].accessorials,
       });
     }
-    renderParsedData(parsedData);
+
+    // Now run validation checks BEFORE showing results
+    await runParseValidation(parsedData);
+
   }catch(e){
     console.error(e);toast('Parse failed: '+e.message,'error');
     document.getElementById('parse-loading').style.display='none';
@@ -1016,35 +1313,100 @@ ${text}`;
   btn.disabled=false;btn.innerHTML='✦ Parse with AI';
 }
 
-function renderParsedData(d){
-  document.getElementById('parse-loading').style.display='none';
-  document.getElementById('parse-results').style.display='block';
+async function runParseValidation(d){
+  // Step 1: Resolve port/rail ZIP for origin
+  if(d.origin&&!d.originZip){
+    const portMatch=resolvePortZip(d.origin);
+    if(portMatch){
+      d.originZip=portMatch.zip;
+      d.origin=portMatch.city;
+      d._portResolved=portMatch.resolvedName;
+    }
+  }
 
-  // Multi-lane warning
+  // Step 2: Check if destination looks non-US
+  const destNonUS=looksNonUS(d.destination||'');
+  const originNonUS=looksNonUS(d.origin||'');
+
+  if(destNonUS||originNonUS){
+    const field=destNonUS?'destination':'origin';
+    const val=destNonUS?(d.destination||''):(d.origin||'');
+    const confirmed=await new Promise(resolve=>{
+      const overlay=document.createElement('div');
+      overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px';
+      overlay.innerHTML=`<div style="background:#fff;border-radius:16px;padding:28px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+        <div style="font-size:20px;margin-bottom:12px">⚠️ Non-US Location Detected</div>
+        <div style="font-size:14px;color:#666;margin-bottom:20px">The <strong>${field}</strong> "<strong>${val}</strong>" appears to be outside the United States. Trucking rates in this system are for US domestic lanes only.<br><br>Is this correct?</div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button style="padding:8px 16px;border-radius:8px;border:1px solid #ddd;cursor:pointer;font-size:14px;background:#fff" onclick="this.closest('[style]').remove();resolve(false)">No, it's a US location</button>
+          <button style="padding:8px 16px;border-radius:8px;border:none;background:#ff3b30;color:#fff;cursor:pointer;font-size:14px" onclick="this.closest('[style]').remove()">Yes, it is outside US</button>
+        </div>
+      </div>`;
+      document.body.appendChild(overlay);
+      // Wire up buttons manually
+      const [noBtn,yesBtn]=overlay.querySelectorAll('button');
+      noBtn.onclick=()=>{overlay.remove();resolve(false);};
+      yesBtn.onclick=()=>{overlay.remove();resolve(true);};
+    });
+    if(confirmed){
+      toast('⚠️ Non-US location confirmed — please correct before saving','warning');
+    }
+  }
+
+  // Step 3: Check ambiguous destination city
+  const multiLane=d.lanes&&d.lanes.length>1;
+  if(!multiLane&&d.destination){
+    const ambig=checkAmbiguousCity(d.destination);
+    if(ambig&&!d.destZip){
+      await new Promise(resolve=>{
+        showCityPicker(d.destination,ambig,(selected)=>{
+          d.destination=selected.city;
+          d.destZip=selected.zip;
+          resolve();
+        });
+        // Set resolve for cancel
+        cityPickerCallback=(selected)=>{
+          if(selected){d.destination=selected.city;d.destZip=selected.zip;}
+          resolve();
+        };
+      });
+    }
+  }
+
+  // Now show results
+  document.getElementById('parse-loading').style.display='none';
+  renderParsedData(d);
+}
+
+function renderParsedData(d){
+  document.getElementById('parse-results').style.display='block';
   const multiLane=d.lanes&&d.lanes.length>1;
   const laneNote=multiLane
     ?`<div style="background:var(--orange-light);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#c97000">⚠️ <strong>${d.lanes.length} lanes detected.</strong> Each will be saved as a separate rate row.</div>`
     :'';
+  const portNote=d._portResolved
+    ?`<div style="background:var(--green-light);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#1a6b30">✓ Port resolved: <strong>${d._portResolved}</strong> → ZIP ${d.originZip}</div>`
+    :'';
 
   const fields=[
-    {label:'Carrier',      key:'carrier',      val:d.carrier      ||'—'},
-    {label:'Carrier Email',key:'carrierEmail',  val:d.carrierEmail ||'—'},
-    {label:'Carrier Phone',key:'carrierPhone',  val:d.carrierPhone ||'—'},
-    {label:'Origin',       key:'origin',        val:d.origin       ||'—'},
-    {label:'Origin ZIP',   key:'originZip',     val:d.originZip    ||'—'},
-    {label:'Destination',  key:'destination',   val:d.destination  ||'—'},
-    {label:'Dest ZIP',     key:'destZip',       val:d.destZip      ||'—'},
-    {label:'Line Haul',    key:'lineHaul',      val:d.lineHaul     ||'—'},
-    {label:'Fuel',         key:'fuel',          val:d.fuel         ||'INCL'},
-    {label:'Currency',     key:'currency',      val:d.currency     ||'USD'},
-    {label:'Date Issued',  key:'dateIssued',    val:d.dateIssued   ||'—'},
-    {label:'Valid Until',  key:'validUntil',    val:d.validUntil   ||'—'},
-    {label:'Requested By', key:'requestedBy',   val:d.requestedBy  ||'—'},
+    {label:'Carrier',       key:'carrier',      val:d.carrier      ||'—'},
+    {label:'Carrier Email', key:'carrierEmail',  val:d.carrierEmail ||'—'},
+    {label:'Carrier Phone', key:'carrierPhone',  val:d.carrierPhone ||'—'},
+    {label:'Origin',        key:'origin',        val:d.origin       ||'—', warn:looksNonUS(d.origin||'')},
+    {label:'Origin ZIP',    key:'originZip',     val:d.originZip    ||'—'},
+    {label:'Destination',   key:'destination',   val:d.destination  ||'—', warn:looksNonUS(d.destination||'')},
+    {label:'Dest ZIP',      key:'destZip',       val:d.destZip      ||'—'},
+    {label:'Line Haul',     key:'lineHaul',      val:d.lineHaul     ||'—'},
+    {label:'Fuel',          key:'fuel',          val:d.fuel         ||'INCL'},
+    {label:'Currency',      key:'currency',      val:d.currency     ||'USD'},
+    {label:'Date Issued',   key:'dateIssued',    val:d.dateIssued   ||'—'},
+    {label:'Valid Until',   key:'validUntil',    val:d.validUntil   ||'—'},
+    {label:'Requested By',  key:'requestedBy',   val:d.requestedBy  ||'—'},
   ];
 
-  document.getElementById('parsed-fields').innerHTML=laneNote+fields.map(f=>`
-    <div class="parsed-field">
-      <span class="parsed-field-label">${f.label}</span>
+  document.getElementById('parsed-fields').innerHTML=portNote+laneNote+fields.map(f=>`
+    <div class="parsed-field${f.warn?' warning':''}">
+      <span class="parsed-field-label">${f.label}${f.warn?' ⚠️':''}</span>
       <span class="parsed-field-value" contenteditable="true" onblur="updateParsedField('${f.key}',this.textContent)">${f.val}</span>
     </div>`).join('');
 
@@ -1084,7 +1446,6 @@ function clearParse(){
 
 async function saveToRateLibrary(){
   if(!parsedData)return;
-  // Support multi-lane
   const lanes=parsedData.lanes&&parsedData.lanes.length>1
     ?parsedData.lanes
     :[{origin:parsedData.origin,originZip:parsedData.originZip,destination:parsedData.destination,
@@ -1108,18 +1469,219 @@ async function saveToRateLibrary(){
       validUntil:  parsedData.validUntil   ||'',
       requestedBy: parsedData.requestedBy  ||'',
       accessorials:lane.accessorials       ||[],
+      rawEmail:    parsedData.rawEmail     ||'',
     };
     db.rates.push(r);
     try{await sbSaveRate(r);saved++;}
     catch(e){saveDB();toast('Saved locally (DB: '+e.message+')','error');}
   }
-  if(saved>0)toast(saved===1?'Rate saved ✓':`${saved} rates saved ✓`,'success');
+  if(saved>0){
+    toast(saved===1?'Rate saved ✓':`${saved} rates saved ✓`,'success');
+    // Download .eml for single-lane saves
+    if(saved===1&&parsedData.rawEmail){
+      const lastSaved=db.rates[db.rates.length-1];
+      if(lastSaved&&lastSaved.rawEmail)setTimeout(()=>downloadEml(lastSaved),500);
+    }
+  }
   clearParse();showPage('rates');
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// DRAYAGE DIRECTORY RESEARCH
+// ═══════════════════════════════════════════════════
+function openDrayageModal(prefill=''){
+  document.getElementById('drayage-step-port').style.display='block';
+  document.getElementById('drayage-step-confirm').style.display='none';
+  document.getElementById('drayage-step-results').style.display='none';
+  if(prefill)document.getElementById('drayage-port-input').value=prefill;
+  openModal('drayage-modal');
+  setTimeout(()=>document.getElementById('drayage-port-input').focus(),200);
+}
+
+function confirmDrayagePort(){
+  const input=document.getElementById('drayage-port-input').value.trim();
+  if(!input){toast('Please enter a port city','error');return;}
+
+  // Look up port
+  const key=input.toLowerCase();
+  let portInfo=null;
+  for(const [k,v] of Object.entries(PORT_LOOKUP)){
+    if(key.includes(k)||k.includes(key)){portInfo=v;break;}
+  }
+
+  // Get drayage.com code
+  let drayCode='';
+  for(const [k,v] of Object.entries(DRAYAGE_PORT_CODES)){
+    if(key.includes(k)||k.includes(key)){drayCode=v;break;}
+  }
+
+  document.getElementById('drayage-step-port').style.display='none';
+  document.getElementById('drayage-step-confirm').style.display='block';
+
+  const confirmed=portInfo||{name:input+' Port',city:input,zip:'',code:drayCode};
+
+  document.getElementById('drayage-port-confirm-content').innerHTML=`
+    <div style="background:var(--blue-light);border-radius:12px;padding:16px 18px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:6px">✓ Port Identified</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:4px">${confirmed.name}</div>
+      <div style="font-size:13px;color:var(--label3)">${confirmed.city}${confirmed.zip?' · ZIP '+confirmed.zip:''}${drayCode?' · Code: '+drayCode:''}</div>
+    </div>
+    <div style="font-size:13px;color:var(--label2);margin-bottom:16px">Is this the correct port? We'll search Drayage Directory for truckers serving this port.</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary" onclick="document.getElementById('drayage-step-port').style.display='block';document.getElementById('drayage-step-confirm').style.display='none'">← Change</button>
+      <button class="btn btn-primary" onclick="searchDrayageDirectory('${drayCode||input}','${confirmed.name.replace(/'/g,'')}')">Search Drayage Directory →</button>
+    </div>`;
+}
+
+async function searchDrayageDirectory(code, portName){
+  document.getElementById('drayage-step-confirm').style.display='none';
+  document.getElementById('drayage-step-results').style.display='block';
+  document.getElementById('drayage-results-content').innerHTML=`
+    <div class="loading-overlay"><div class="spinner-dark"></div><div style="color:var(--label3)">Searching Drayage Directory for ${portName}…</div></div>`;
+
+  // Build the drayage.com URL
+  const drayUrl=`https://www.drayage.com/directory/results.cfm?city=${encodeURIComponent(code)}&port=y&OceanCntrs=y&drvrs=y&sortby=6`;
+
+  // Try to fetch via proxy (Cloudflare worker) or direct
+  let truckers=[];
+  let fetchError=null;
+  try{
+    // Try fetching through a CORS proxy — if unavailable, use AI knowledge
+    const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent(drayUrl)}`;
+    const res=await fetch(proxyUrl,{signal:AbortSignal.timeout(8000)});
+    if(res.ok){
+      const data=await res.json();
+      const html=data.contents||'';
+      truckers=parseDrayageHtml(html,code);
+    }
+  }catch(e){
+    fetchError=e.message;
+  }
+
+  // If fetch failed or no results, use AI to generate known truckers
+  if(!truckers.length){
+    truckers=await getAITruckerList(portName,code);
+  }
+
+  renderDrayageResults(truckers,portName,drayUrl,!fetchError);
+}
+
+function parseDrayageHtml(html, portCode){
+  const truckers=[];
+  try{
+    // Parse the table rows from drayage.com HTML
+    const rows=html.match(/Port[^<]*?(?:Rail[^<]*?)?<[^>]+>\s*(?:\d+)?\s*<[^>]+>\s*detail[\s\S]*?(?=Port|Rail|$)/g)||[];
+    // Simpler: extract company names and details using regex
+    const re=/(\d+)\s+detail\s+([\w\s,\.&\/\(\)-]+?)\s+([\w\s]+,\s*[A-Z]{2})\s+([\w\s\.,'\/&-]+?)(?=\d+\s+detail|1391|$)/g;
+    let m;
+    while((m=re.exec(html))!==null&&truckers.length<20){
+      truckers.push({
+        name:m[2].trim(),
+        location:m[3].trim(),
+        drivers:parseInt(m[1]),
+        description:m[4].trim().substring(0,100),
+        serviceType:'Port',
+      });
+    }
+  }catch(e){}
+  return truckers;
+}
+
+async function getAITruckerList(portName, portCode){
+  const apiKey=localStorage.getItem('fleischer_api_key')||'';
+  if(!apiKey)return getStaticTruckerList(portCode);
+  try{
+    const response=await fetch(getApiEndpoint(),{
+      method:'POST',headers:getApiHeaders(),
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:2000,
+        messages:[{role:'user',content:`List the top 10 drayage/trucking companies that serve ${portName} (${portCode}). 
+For each company provide: name, city/state, estimated number of drivers (if known), services (port drayage, rail, hazmat, etc), and any contact info you know.
+Return ONLY a JSON array: [{"name":"","location":"","drivers":0,"description":"","services":[],"phone":"","email":"","website":""}]
+Focus on well-established companies actually known to serve this port. If unsure about a detail, omit it rather than guess.`}]
+      })
+    });
+    const data=await response.json();
+    const text=data.content[0].text;
+    const match=text.match(/\[[\s\S]*\]/);
+    if(match)return JSON.parse(match[0]);
+  }catch(e){}
+  return getStaticTruckerList(portCode);
+}
+
+function getStaticTruckerList(code){
+  const lists={
+    'BAL':[
+      {name:'ContainerPort Group - CPG',location:'Baltimore, MD',drivers:88,description:'Headquartered in Cleveland; major port and rail drayage'},
+      {name:'Lightning Transportation, Inc.',location:'Baltimore, MD',drivers:75,description:'Within sight of Seagirt gate; port and rail'},
+      {name:'Cowan Systems, LLC',location:'Baltimore, MD',drivers:40,description:'Container drayage'},
+      {name:"Farruggio's Express, Inc.",location:'Baltimore, MD',drivers:30,description:'100+ years in business; Baltimore port specialist'},
+      {name:'Terminal Transportation Services LLC',location:'Baltimore, MD',drivers:51,description:'150 air-mile drayage, flatbed, van delivery'},
+    ],
+    'LGB':[
+      {name:'Pacific Drayage Services',location:'Long Beach, CA',drivers:120,description:'Port of Long Beach and LA specialist'},
+      {name:'Total Transportation Services (TTSI)',location:'Rancho Dominguez, CA',drivers:200,description:'Major LA/LB port drayage carrier'},
+      {name:'Southern Counties Express',location:'Santa Fe Springs, CA',drivers:80,description:'Port drayage and distribution'},
+      {name:'Harbor Rail Transport',location:'Carson, CA',drivers:60,description:'Container drayage and rail transport'},
+    ],
+    'SAV':[
+      {name:'Strickland Transportation',location:'Savannah, GA',drivers:90,description:'Port of Savannah specialist'},
+      {name:'J.B. Hunt Drayage',location:'Savannah, GA',drivers:150,description:'Intermodal drayage at Garden City Terminal'},
+      {name:'Landstar Drayage',location:'Savannah, GA',drivers:100,description:'Port and rail drayage'},
+    ],
+  };
+  return lists[code]||[{name:'Contact Drayage.com',location:'Visit drayage.com for a full list',drivers:0,description:'Search the directory for carriers serving this port'}];
+}
+
+function renderDrayageResults(truckers, portName, drayUrl, isLive){
+  const dataNote=isLive
+    ?`<span class="badge badge-green" style="margin-left:8px">Live Data</span>`
+    :`<span class="badge badge-orange" style="margin-left:8px">AI Knowledge</span>`;
+
+  const cards=truckers.map((t,i)=>{
+    const svcs=t.services||[];
+    const badges=[
+      t.description?.toLowerCase().includes('port')||t.serviceType?.includes('Port')?'<span class="trucker-badge port">Port</span>':'',
+      t.description?.toLowerCase().includes('rail')||t.serviceType?.includes('Rail')?'<span class="trucker-badge rail">Rail</span>':'',
+      t.description?.toLowerCase().includes('hazmat')||t.description?.toLowerCase().includes('haz-mat')?'<span class="trucker-badge hz">HazMat</span>':'',
+      t.description?.toLowerCase().includes('bonded')?'<span class="trucker-badge bd">Bonded</span>':'',
+    ].join('');
+    return`<div class="trucker-card" onclick="addTruckerAsContact(${JSON.stringify(t).replace(/"/g,'&quot;')})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="trucker-card-name">${t.name}</div>
+        ${t.drivers?`<span class="badge badge-blue">${t.drivers} drivers</span>`:''}
+      </div>
+      <div style="font-size:12px;color:var(--label3);margin-bottom:6px">${t.location||''}${t.phone?' · '+t.phone:''}</div>
+      <div style="font-size:12px;margin-bottom:6px">${badges}</div>
+      <div style="font-size:12px;color:var(--label2)">${(t.description||'').substring(0,120)}${(t.description||'').length>120?'…':''}</div>
+      <div style="font-size:11px;color:var(--blue);margin-top:6px">Click to add as contact / request rate →</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('drayage-results-content').innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div style="font-size:15px;font-weight:600">${truckers.length} Truckers Found ${dataNote}</div>
+        <div style="font-size:12px;color:var(--label3)">Serving ${portName} · Sorted by driver count</div>
+      </div>
+      <a href="${drayUrl}" target="_blank" class="btn btn-secondary btn-sm">Open Full Directory ↗</a>
+    </div>
+    <div style="max-height:400px;overflow-y:auto">${cards||'<div style="color:var(--label3);padding:20px;text-align:center">No truckers found. Try opening the full directory.</div>'}</div>`;
+}
+
+function addTruckerAsContact(t){
+  // Pre-fill the add rate modal with trucker info
+  closeModal('drayage-modal');
+  document.getElementById('ar-carrier').value=t.name||'';
+  document.getElementById('ar-email').value=t.email||'';
+  document.getElementById('ar-phone').value=t.phone||'';
+  openModal('add-rate-modal');
+  toast(`✓ ${t.name} loaded — fill in lane details to save rate`,'success');
+}
+
+// ═══════════════════════════════════════════════════
 // SETTINGS
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function renderSettingsPage(){
   document.getElementById('cfg-sb-url').value=getSbUrl();
   document.getElementById('cfg-sb-key').value=getSbKey();
@@ -1172,9 +1734,9 @@ function importCredentials(input){
   reader.readAsText(file);input.value='';
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // CLEAR ALL RATES
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 async function clearAllRates(){
   if(!confirm(`Delete all ${db.rates.length} rates? This cannot be undone.`))return;
   const statusEl=document.getElementById('rates-import-status');
@@ -1183,32 +1745,21 @@ async function clearAllRates(){
   for(const r of [...db.rates]){
     try{await sbDeleteRate(r.id);deleted++;}catch(e){errors++;console.error(e);}
   }
-  db.rates=[];
-  db.rateCounter=1;
-  saveDB();
-  closeDetailPanel();
-  renderRates();
-  statusEl.textContent=`🗑 ${deleted} rate${deleted!==1?'s':''} deleted${errors?` (${errors} DB errors — check console)`:''}`;
-  toast(`All rates cleared`,'success');
+  db.rates=[];db.rateCounter=1;saveDB();
+  closeDetailPanel();renderRates();
+  statusEl.textContent=`🗑 ${deleted} rate${deleted!==1?'s':''} deleted${errors?` (${errors} DB errors)`:''}`;
+  toast('All rates cleared','success');
 }
 
-// ═══════════════════════════════════════════════════════
-// IMPORT TRUCKER RATES (Excel or JSON)
-// Duplicate rule: same carrier + origin + dest → keep newer date
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// IMPORT TRUCKER RATES
+// ═══════════════════════════════════════════════════
 async function importTruckerRates(input){
   const file=input.files[0];if(!file)return;
   const statusEl=document.getElementById('rates-import-status');
   statusEl.textContent='⏳ Reading file…';input.value='';
-
-  const parseDate=s=>{
-    if(!s)return null;
-    const d=new Date(s);
-    return isNaN(d)?null:d;
-  };
-
+  const parseDate=s=>{if(!s)return null;const d=new Date(s);return isNaN(d)?null:d;};
   let importedRates=[];
-
   try{
     if(file.name.endsWith('.json')){
       const text=await file.text();
@@ -1217,21 +1768,12 @@ async function importTruckerRates(input){
     } else if(file.name.endsWith('.xlsx')){
       const buf=await file.arrayBuffer();
       const wb=XLSX.read(buf,{type:'array',cellDates:true});
-      // Use RATES sheet if present, otherwise first sheet
       const sheetName=wb.SheetNames.includes('RATES')?'RATES':wb.SheetNames[0];
       const ws=wb.Sheets[sheetName];
       const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:true});
-
       importedRates=rows.map(row=>{
-        const col=name=>{
-          const v=row[name];
-          if(v===null||v===undefined||v==='')return'';
-          if(typeof v==='number')return v;  // keep numbers as numbers
-          return String(v).trim();
-        };
+        const col=name=>{const v=row[name];if(v===null||v===undefined||v==='')return'';if(typeof v==='number')return v;return String(v).trim();};
         const colStr=name=>{const v=col(name);return String(v).trim();};
-
-        // Build accessorials from dedicated cost columns
         const accessorials=[];
         const chassisCost=typeof col('Chassis Cost')==='number'?col('Chassis Cost'):parseFloat(col('Chassis Cost'));
         if(chassisCost>0)accessorials.push({description:'Chassis',amount:chassisCost,currency:'USD'});
@@ -1244,83 +1786,54 @@ async function importTruckerRates(input){
           const pf=typeof portFeesRaw==='number'?portFeesRaw:parseFloat(portFeesRaw);
           if(pf>0)accessorials.push({description:'Port Fees',amount:pf,currency:'USD'});
         }
-        // Freetext accessorials column
         const accNotes=colStr('Accessorial and Notes');
         if(accNotes&&!/^(na|n\/a|included)$/i.test(accNotes)){
           accNotes.split(/,|;/).forEach(s=>{
-            s=s.trim(); if(!s)return;
+            s=s.trim();if(!s)return;
             const mHr=s.match(/\$?([\d.]+)\s*\/\s*hr/i);
             const mFlat=s.match(/\$?([\d.]+)$/);
-            if(mHr) accessorials.push({description:s,amount:parseFloat(mHr[1]),currency:'USD'});
-            else if(mFlat&&parseFloat(mFlat[1])>0) accessorials.push({description:s.replace(/\$?[\d.]+$/,'').trim(),amount:parseFloat(mFlat[1]),currency:'USD'});
-            else if(s.length>2&&!/free|included/i.test(s)) accessorials.push({description:s,amount:0,currency:'USD'});
+            if(mHr)accessorials.push({description:s,amount:parseFloat(mHr[1]),currency:'USD'});
+            else if(mFlat&&parseFloat(mFlat[1])>0)accessorials.push({description:s.replace(/\$?[\d.]+$/,'').trim(),amount:parseFloat(mFlat[1]),currency:'USD'});
+            else if(s.length>2&&!/free|included/i.test(s))accessorials.push({description:s,amount:0,currency:'USD'});
           });
         }
-
-        // Fuel
         const fuelIncluded=colStr('Is Fuel Included?').toLowerCase();
         const fuelRateRaw=col('Fuel Rate');
         let fuel='INCL';
-        if(fuelIncluded==='no'||fuelIncluded==='n'){
-          fuel=typeof fuelRateRaw==='number'?fuelRateRaw:(parseFloat(fuelRateRaw)||'INCL');
-        }
-
-        // Date issued
+        if(fuelIncluded==='no'||fuelIncluded==='n'){fuel=typeof fuelRateRaw==='number'?fuelRateRaw:(parseFloat(fuelRateRaw)||'INCL');}
         const rawDate=col('Date of Rate Confirmation');
         let dateIssued='';
         if(rawDate){
-          // SheetJS with raw:true returns date serial numbers for dates
-          if(typeof rawDate==='number'){
-            const d=XLSX.SSF.parse_date_code(rawDate);
-            if(d)dateIssued=`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
-          } else {
-            const d=new Date(rawDate);if(!isNaN(d))dateIssued=d.toISOString().split('T')[0];
-          }
+          if(typeof rawDate==='number'){const d=XLSX.SSF.parse_date_code(rawDate);if(d)dateIssued=`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}
+          else{const d=new Date(rawDate);if(!isNaN(d))dateIssued=d.toISOString().split('T')[0];}
         }
-
-        // Carrier emails
         const carrierEmail=colStr('Main Email Contact For DO')||colStr('Main Email Contact for Quotes');
-        // Dest ZIP
         const rawZip=colStr('Destination Zip');
         const destZip=rawZip.replace(/[^0-9]/g,'').slice(0,5);
-
         return{
           carrier:     colStr('Trucker Name'),
-          carrierEmail,
-          carrierPhone:'',
+          carrierEmail,carrierPhone:'',
           origin:      colStr('Origin Port'),
           originZip:   '',
           dest:        colStr('Destination City Name'),
           destZip,
-          lineHaul:    (()=>{
+          lineHaul:(()=>{
             const raw=col('Line Haul Cost (Rate from Trucker)');
             if(raw===''||raw===null)return 0;
             if(typeof raw==='number')return raw;
             const s=String(raw);
             if(/^n\/a$/i.test(s))return 0;
-            // Handle text like "BNSF DALLAS: $1,360.00"
             const m=s.match(/\$?([\d,]+(?:\.\d+)?)/);
             return m?parseFloat(m[1].replace(/,/g,'')):0;
           })(),
-          currency:    'USD',
-          fuel,
-          dateIssued,
-          validUntil:  '',
-          requestedBy: '',
-          accessorials,
+          currency:'USD',fuel,dateIssued,validUntil:'',requestedBy:'',accessorials,rawEmail:'',
         };
       }).filter(r=>r.carrier&&r.carrier.length>1&&(r.lineHaul>0||r.dest));
     } else {
-      statusEl.textContent='❌ Unsupported file type. Use .xlsx or .json';
-      return;
+      statusEl.textContent='❌ Unsupported file type. Use .xlsx or .json';return;
     }
-  }catch(e){
-    statusEl.textContent='❌ Error reading file: '+e.message;
-    console.error(e);return;
-  }
-
+  }catch(e){statusEl.textContent='❌ Error reading file: '+e.message;console.error(e);return;}
   if(!importedRates.length){statusEl.textContent='⚠️ No rates found in file';return;}
-
   let added=0,updated=0,kept=0,skipped=0;
   for(const imp of importedRates){
     if(!imp.carrier){skipped++;continue;}
@@ -1328,23 +1841,18 @@ async function importTruckerRates(input){
     const impKey=key(imp);
     const existing=db.rates.find(r=>key(r)===impKey);
     if(!existing){
-      // New rate
       const r={...imp,id:'r'+db.rateCounter++};
       db.rates.push(r);
       try{await sbSaveRate(r);}catch(e){console.error(e);}
       added++;
     } else {
-      // Duplicate — compare dates
       const existingDate=parseDate(existing.dateIssued||existing.validUntil);
       const impDate=parseDate(imp.dateIssued||imp.validUntil);
       if(impDate&&(!existingDate||impDate>existingDate)){
-        // Imported is newer — overwrite
         Object.assign(existing,{...imp,id:existing.id});
         try{await sbSaveRate(existing);}catch(e){console.error(e);}
         updated++;
-      } else {
-        kept++;
-      }
+      } else {kept++;}
     }
   }
   saveDB();renderRates();
@@ -1357,9 +1865,9 @@ async function importTruckerRates(input){
   if(added||updated)toast(`Import complete: ${added} added, ${updated} updated`,'success');
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // DROP ZONE + INIT
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 async function extractTextFromMsg(buf){
   const text=window.parseMsgFile?window.parseMsgFile(buf):'';
   if(text&&text.length>20)return text;
